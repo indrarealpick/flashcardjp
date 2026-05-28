@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Flashcard 日本語</title>
+<link rel="icon" type="image/png" href="https://indrarealpick.github.io/flashcardjp/android_playstore_512.png"/>
+<link rel="apple-touch-icon" href="https://indrarealpick.github.io/flashcardjp/android_playstore_512.png"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#06091C"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Flashcard JP"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#06091C;min-height:100vh;font-family:'Noto Sans JP','Zen Kaku Gothic New',sans-serif;color:#FFF8EE;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:rgba(232,177,93,0.2);border-radius:3px}
+input,button,select{font-family:inherit;-webkit-tap-highlight-color:transparent}
+input::placeholder{color:rgba(255,248,238,0.2)}
+button{cursor:pointer;transition:transform 0.12s ease,opacity 0.12s ease,box-shadow 0.15s ease}
+button:active{opacity:0.82;transform:scale(0.96)!important}
+select option{background:#0D1526;color:#FFF8EE}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+
+#root{position:relative;z-index:1}
+.container{max-width:660px;margin:0 auto;padding:0 1rem 5rem}
+
+/* ── Auth screen ── */
+#auth-screen{
+  display:none;position:fixed;inset:0;z-index:80;
+  background:#06091C;
+  flex-direction:column;align-items:center;justify-content:center;
+  padding:2rem;
+}
+#auth-screen.active{display:flex}
+
+/* ── Study overlay ── */
+#study-overlay{
+  display:none;position:fixed;inset:0;z-index:50;
+  flex-direction:column;align-items:center;justify-content:center;
+  background:#06091C;
+}
+#study-overlay.active{display:flex}
+
+.prog-track{height:2px;border-radius:2px;background:rgba(255,255,255,0.08);overflow:hidden}
+.prog-fill{height:100%;border-radius:2px;transition:width 0.4s ease;background:#E8B15D}
+
+/* ── Flip card ── */
+.flip-wrap{perspective:1200px;width:100%;max-width:440px;height:290px;margin:0 auto;cursor:pointer;user-select:none;transition:transform 0.2s ease}
+.flip-wrap:hover{transform:translateY(-2px)}
+.flip-inner{transform-style:preserve-3d;transition:transform 0.5s cubic-bezier(0.42,0.14,0.14,1);width:100%;height:100%;position:relative}
+.flip-inner.flipped{transform:rotateY(180deg)}
+.flip-face{backface-visibility:hidden;-webkit-backface-visibility:hidden;position:absolute;inset:0;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.flip-front{background:linear-gradient(180deg,rgba(26,36,72,0.98) 0%,rgba(16,22,48,0.99) 100%);border:1px solid rgba(255,255,255,0.14);box-shadow:0 12px 44px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.08)}
+.flip-back{background:linear-gradient(180deg,rgba(16,30,20,0.98) 0%,rgba(8,16,11,0.99) 100%);border:1px solid rgba(255,255,255,0.09);transform:rotateY(180deg);box-shadow:0 12px 44px rgba(0,0,0,0.5),0 0 24px rgba(110,231,120,0.05),inset 0 1px 0 rgba(255,255,255,0.06),inset 0 -1px 0 rgba(0,0,0,0.2)}
+
+/* ── Modal ── */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:60;align-items:center;justify-content:center;background:rgba(4,7,20,0.88);padding:1rem;overflow-y:auto}
+.modal-overlay.open{display:flex}
+.modal-box{background:linear-gradient(180deg,#141E3A,#0E1528);border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:1.5rem;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.8),0 0 0 1px rgba(255,255,255,0.03);margin:auto;animation:fadeUp 0.2s ease}
+
+/* ── Form ── */
+.field-label{display:block;font-size:0.62rem;color:rgba(255,248,238,0.38);letter-spacing:1.8px;margin-bottom:6px;text-transform:uppercase;font-weight:600}
+.field-input{width:100%;background:#131F38;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#FFF8EE;padding:11px 13px;font-size:0.9rem;outline:none;transition:border-color 0.15s,box-shadow 0.15s}
+.field-input:focus{border-color:#E8B15D;box-shadow:0 0 0 3px rgba(232,177,93,0.08)}
+.field-input.jp{font-family:'Noto Sans JP',sans-serif;font-size:1.5rem;letter-spacing:0;font-weight:700;padding:13px 15px}
+.field-input.hi{font-family:'Noto Serif JP',serif;letter-spacing:1px}
+.field-select{width:100%;background:#131F38;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#FFF8EE;padding:11px 13px;font-size:0.9rem;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='rgba(255,248,238,0.35)' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;transition:border-color 0.15s}
+.field-select:focus{border-color:#E8B15D}
+
+/* ── Buttons ── */
+.btn-gold{background:linear-gradient(180deg,#F0C06A,#DDA64C);color:#0D0F18;border:none;font-weight:700;border-radius:10px;padding:12px 20px;font-size:0.88rem;cursor:pointer;transition:filter 0.15s,transform 0.12s,box-shadow 0.15s;box-shadow:0 4px 14px rgba(232,177,93,0.28),inset 0 1px 0 rgba(255,255,255,0.18);letter-spacing:0.2px}
+.btn-gold:hover{filter:brightness(1.06);box-shadow:0 6px 20px rgba(232,177,93,0.38),inset 0 1px 0 rgba(255,255,255,0.18);transform:translateY(-1px)}
+.btn-gold:active{transform:translateY(0)!important;filter:brightness(0.96)}
+.btn-ghost{background:rgba(255,255,255,0.055);border:1px solid rgba(255,255,255,0.1);color:rgba(255,248,238,0.58);border-radius:10px;padding:12px 18px;font-size:0.88rem;cursor:pointer;transition:background 0.18s,color 0.18s,border-color 0.18s,transform 0.12s}
+.btn-ghost:hover{background:rgba(255,255,255,0.1);color:#FFF8EE;border-color:rgba(255,255,255,0.18);transform:translateY(-1px)}
+.btn-ghost:active{transform:translateY(0)!important}
+
+/* ── Toast ── */
+#toast{display:none;position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);padding:10px 22px;border-radius:11px;font-size:0.82rem;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,0.6);white-space:nowrap;z-index:99;pointer-events:none}
+#toast.show{display:block;animation:toastIn 0.25s ease forwards}
+#toast.ok{background:#0D1526;border:1px solid rgba(232,177,93,0.3);color:#E8B15D}
+#toast.err{background:#1a0a0a;border:1px solid rgba(248,113,113,0.3);color:#fca5a5}
+#toast.info{background:#0D1526;border:1px solid rgba(126,181,232,0.3);color:#7eb5e8}
+
+/* ── Card list ── */
+.card-item{animation:fadeUp 0.18s ease forwards;background:linear-gradient(180deg,rgba(20,28,52,0.96),rgba(12,16,36,0.98));border:1px solid rgba(255,255,255,0.09);border-radius:14px;padding:15px 16px;display:flex;align-items:center;gap:13px;margin-bottom:8px;transition:border-color 0.18s,box-shadow 0.18s,transform 0.18s;box-shadow:0 4px 18px rgba(0,0,0,0.35)}
+.card-item:hover{border-color:rgba(232,177,93,0.22);box-shadow:0 6px 24px rgba(0,0,0,0.45),0 0 0 1px rgba(232,177,93,0.04);transform:translateY(-1px)}
+.card-item .card-actions button{opacity:0;transition:opacity 0.12s}
+.card-item:hover .card-actions button{opacity:1!important}
+
+/* ── Category card ── */
+.cat-card{background:linear-gradient(180deg,rgba(20,28,52,0.96),rgba(12,16,36,0.98));border:1px solid rgba(255,255,255,0.09);border-radius:14px;padding:16px;cursor:pointer;display:flex;align-items:center;gap:13px;margin-bottom:9px;transition:border-color 0.15s,box-shadow 0.15s,transform 0.15s;box-shadow:0 4px 18px rgba(0,0,0,0.3)}
+.cat-card:hover{border-color:rgba(232,177,93,0.22);background:rgba(24,34,64,0.98);transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,0,0,0.45)}
+
+/* ── Breadcrumb ── */
+.breadcrumb-btn{display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;color:rgba(255,248,238,0.4);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:100px;padding:7px 16px;cursor:pointer;transition:all 0.18s;margin-bottom:20px;font-weight:500;letter-spacing:0.2px}
+.breadcrumb-btn:hover{color:#E8B15D;border-color:rgba(232,177,93,0.25);background:rgba(232,177,93,0.05);transform:translateX(-1px)}
+
+/* ── Search ── */
+.search-wrap{position:relative;margin-bottom:14px}
+.search-wrap::before{content:'🔍';font-size:0.72rem;position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;opacity:0.35}
+.search-input{width:100%;background:#0F1830;border:1px solid rgba(255,255,255,0.09);border-radius:11px;color:#FFF8EE;padding:10px 14px 10px 36px;font-size:0.88rem;outline:none;transition:border-color 0.15s}
+.search-input:focus{border-color:rgba(232,177,93,0.4)}
+
+/* ── Color picker ── */
+.cp-btn{width:34px;height:34px;border-radius:9px;font-size:0.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.12s;border:2px solid transparent}
+.cp-btn:hover{transform:scale(1.1)}
+
+/* ── Loading spinner ── */
+.spinner{width:32px;height:32px;border:2px solid rgba(232,177,93,0.15);border-top-color:#E8B15D;border-radius:50%;animation:spin 0.7s linear infinite}
+
+/* ── User avatar ── */
+.user-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:100px;padding:5px 12px 5px 6px;font-size:0.75rem;color:rgba(255,248,238,0.55)}
+.user-avatar{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#E8B15D,#DDA64C);display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;color:#0D0F18}
+
+@media(max-width:480px){
+  .flip-wrap{height:260px}
+  .cat-card,.card-item{padding:13px 14px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ AUTH SCREEN ══ -->
+<div id="auth-screen" class="active">
+  <div style="text-align:center;margin-bottom:2rem">
+    <img src="https://indrarealpick.github.io/flashcardjp/android_playstore_512.png" alt="Flashcard Jepang"
+      style="width:88px;height:88px;border-radius:22px;margin-bottom:16px;box-shadow:0 8px 28px rgba(0,0,0,0.45);display:block;margin-left:auto;margin-right:auto"
+      onerror="this.style.display='none'"/>
+    <h1 style="font-family:'Noto Serif JP',serif;font-size:clamp(1.6rem,5.5vw,2.4rem);color:#FFF8EE;font-weight:700;line-height:1.2">Flashcard 日本語</h1>
+    <p style="color:rgba(255,248,238,0.28);font-size:0.78rem;margin-top:8px">Masuk atau daftar untuk mulai belajar</p>
+  </div>
+
+  <div style="width:100%;max-width:360px">
+    <div style="background:linear-gradient(180deg,#141E3A,#0E1528);border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:1.5rem">
+
+      <!-- Tab toggle -->
+      <div style="display:flex;background:rgba(255,255,255,0.05);border-radius:10px;padding:3px;margin-bottom:22px">
+        <button id="tab-login" onclick="switchTab('login')"
+          style="flex:1;padding:8px;border-radius:8px;border:none;font-size:0.8rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;transition:all 0.18s;background:linear-gradient(180deg,#F0C06A,#DDA64C);color:#0D0F18;box-shadow:0 2px 8px rgba(232,177,93,0.25)">
+          Masuk
+        </button>
+        <button id="tab-register" onclick="switchTab('register')"
+          style="flex:1;padding:8px;border-radius:8px;border:none;font-size:0.8rem;font-weight:600;letter-spacing:0.5px;cursor:pointer;transition:all 0.18s;background:transparent;color:rgba(255,248,238,0.4)">
+          Daftar
+        </button>
+      </div>
+
+      <!-- Email -->
+      <div style="margin-bottom:13px">
+        <label class="field-label">Email</label>
+        <input id="auth-email" class="field-input" type="email" placeholder="kamu@email.com"
+          onkeydown="if(event.key==='Enter')document.getElementById('auth-password').focus()"/>
+      </div>
+
+      <!-- Password -->
+      <div style="margin-bottom:6px">
+        <label class="field-label">Password</label>
+        <div style="position:relative">
+          <input id="auth-password" class="field-input" type="password" placeholder="Minimal 6 karakter"
+            style="padding-right:44px"
+            onkeydown="if(event.key==='Enter')submitAuth()"/>
+          <button onclick="toggleAuthPw()" id="auth-pw-eye"
+            style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,248,238,0.38);cursor:pointer;font-size:1rem;padding:4px;line-height:1">👁</button>
+        </div>
+      </div>
+
+      <!-- Confirm password (register only) -->
+      <div id="confirm-pw-wrap" style="display:none;margin-bottom:6px">
+        <label class="field-label">Konfirmasi Password</label>
+        <div style="position:relative">
+          <input id="auth-confirm-password" class="field-input" type="password" placeholder="Ulangi password"
+            style="padding-right:44px"
+            onkeydown="if(event.key==='Enter')submitAuth()"/>
+          <button onclick="toggleAuthConfirmPw()" id="auth-confirm-eye"
+            style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,248,238,0.38);cursor:pointer;font-size:1rem;padding:4px;line-height:1">👁</button>
+        </div>
+      </div>
+
+      <!-- Error message -->
+      <p id="auth-error" style="display:none;font-size:0.72rem;color:#fca5a5;margin-top:8px;margin-bottom:4px;line-height:1.5;text-align:center"></p>
+
+      <!-- Submit button -->
+      <button id="auth-submit-btn" onclick="submitAuth()" class="btn-gold"
+        style="width:100%;border-radius:10px;padding:13px;font-size:0.9rem;margin-top:16px">
+        Masuk
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ STUDY OVERLAY ══ -->
+<div id="study-overlay">
+  <div style="width:100%;max-width:500px;display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem 0.5rem">
+    <button onclick="closeStudy()" style="font-size:0.76rem;color:rgba(255,248,238,0.5);background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:100px;padding:7px 15px;cursor:pointer;font-weight:500">← Keluar</button>
+    <div style="text-align:center">
+      <div id="study-cat-label" style="font-size:0.58rem;color:rgba(255,248,238,0.28);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px;font-weight:600"></div>
+      <span id="study-counter" style="font-size:0.8rem;color:rgba(255,248,238,0.42);letter-spacing:2px">1 / 0</span>
+    </div>
+    <button id="shuffle-btn" onclick="toggleShuffle()" style="font-size:0.76rem;color:rgba(255,248,238,0.38);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:100px;padding:7px 15px;cursor:pointer;font-weight:500">⇄ Acak</button>
+  </div>
+  <div style="width:100%;max-width:500px;padding:0 1.25rem;margin-bottom:1.5rem">
+    <div class="prog-track"><div id="study-prog" class="prog-fill" style="width:0%"></div></div>
+  </div>
+  <div style="width:100%;padding:0 1.25rem;max-width:500px">
+    <div class="flip-wrap" onclick="flipCard()">
+      <div class="flip-inner" id="flip-inner">
+        <div class="flip-face flip-front" style="overflow:hidden">
+          
+          <span id="study-jp" style="font-family:'Noto Sans JP',sans-serif;font-size:clamp(2.8rem,11vw,4.6rem);color:#FFF8EE;font-weight:700;letter-spacing:0;line-height:1.15;text-align:center;padding:0 1.25rem;text-shadow:0 2px 8px rgba(0,0,0,0.3)"></span>
+          <span style="font-size:0.68rem;color:rgba(255,255,255,0.42);letter-spacing:2.5px;margin-top:8px">タップして答えを見る</span>
+        </div>
+        <div class="flip-face flip-back">
+          <span id="study-hira" style="font-family:'Noto Sans JP',sans-serif;font-size:1rem;color:rgba(180,235,180,0.9);letter-spacing:0.5px;font-weight:500"></span>
+          <span id="study-roma" style="font-size:0.82rem;color:rgba(180,235,180,0.65);letter-spacing:1.5px;font-style:italic"></span>
+          <div style="width:28px;height:1px;background:rgba(255,255,255,0.1);margin:5px 0"></div>
+          <span id="study-mean" style="font-size:clamp(1.3rem,5vw,2rem);color:#FFF8EE;font-weight:700;text-align:center;padding:0 1.5rem;line-height:1.25;letter-spacing:0.3px"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p style="margin-top:1.5rem;font-size:0.58rem;color:rgba(255,255,255,0.38);letter-spacing:2.5px;font-family:monospace;text-transform:uppercase">← → navigasi · space flip · esc keluar</p>
+  <div style="display:flex;align-items:center;gap:12px;margin-top:1.4rem">
+    <button onclick="studyPrev()" style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,248,238,0.7);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center" onmouseover="this.style.transform='scale(1.06)';this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.transform='scale(1)';this.style.background='rgba(255,255,255,0.06)'">‹</button>
+    <button id="flip-btn" onclick="flipCard()" class="btn-gold" style="padding:11px 30px;border-radius:11px">Lihat Arti</button>
+    <button onclick="studyNext()" style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,248,238,0.7);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center" onmouseover="this.style.transform='scale(1.06)';this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.transform='scale(1)';this.style.background='rgba(255,255,255,0.06)'">›</button>
+  </div>
+</div>
+
+<!-- ══ MODAL — Kategori ══ -->
+<div id="modal-cat" class="modal-overlay">
+  <div class="modal-box">
+    <h3 id="modal-cat-title" style="font-size:0.68rem;color:#E8B15D;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:20px;font-weight:700">＋ Buat Kategori</h3>
+    <input type="hidden" id="modal-cat-id"/>
+    <div style="margin-bottom:14px">
+      <label class="field-label">Nama Kategori</label>
+      <input id="modal-cat-name" class="field-input" placeholder="Contoh: N5, Kata Kerja, Makanan..." maxlength="40" onkeydown="if(event.key==='Enter')saveCategory()"/>
+    </div>
+    <div style="margin-bottom:20px">
+      <label class="field-label">Warna &amp; Ikon</label>
+      <div id="color-picker" style="display:flex;flex-wrap:wrap;gap:7px;margin-top:5px"></div>
+    </div>
+    <div style="display:flex;gap:9px">
+      <button onclick="saveCategory()" class="btn-gold" style="flex:1;border-radius:10px">Simpan</button>
+      <button onclick="closeCatModal()" class="btn-ghost">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL — Flashcard ══ -->
+<div id="modal-card" class="modal-overlay">
+  <div class="modal-box" style="max-width:440px">
+    <h3 id="modal-card-title" style="font-size:0.68rem;color:#E8B15D;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:20px;font-weight:700">＋ Tambah Flashcard</h3>
+    <input type="hidden" id="cm-edit-id"/>
+    <div style="margin-bottom:13px">
+      <label class="field-label">Kategori</label>
+      <select id="cm-category" class="field-select"></select>
+    </div>
+    <div style="margin-bottom:13px">
+      <label class="field-label">Kata / Kanji Jepang</label>
+      <input id="cm-japanese" class="field-input jp" placeholder="例：食べる" oninput="onJapaneseInput(this.value)"/>
+      <div id="ai-status" style="display:none;align-items:center;gap:6px;margin-top:7px;flex-wrap:wrap">
+        <span id="ai-badge" style="font-size:0.62rem;letter-spacing:1.5px;text-transform:uppercase;border-radius:6px;padding:3px 9px;font-weight:700"></span>
+        <button id="ai-retry-btn" onclick="retryTranslate()" style="display:none;font-size:0.65rem;color:#E8B15D;background:rgba(232,177,93,0.1);border:1px solid rgba(232,177,93,0.22);border-radius:6px;padding:3px 9px;cursor:pointer;font-weight:600">↺ Coba lagi</button>
+      </div>
+      <p id="ai-error-msg" style="display:none;font-size:0.68rem;color:#fca5a5;margin-top:5px;line-height:1.5"></p>
+    </div>
+    <div style="margin-bottom:13px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <label class="field-label" style="margin-bottom:0">Cara Baca (Hiragana)</label>
+        <span id="ai-filling" style="display:none;font-size:0.6rem;color:rgba(126,181,232,0.8);font-weight:600">AI mengisi...</span>
+      </div>
+      <input id="cm-hiragana" class="field-input hi" placeholder="たべる" oninput="manualFields.hiragana=true"/>
+    </div>
+    <div style="margin-bottom:13px">
+      <label class="field-label">Cara Baca (Romaji)</label>
+      <input id="cm-romaji" class="field-input" placeholder="taberu" oninput="manualFields.romaji=true"/>
+    </div>
+    <div style="margin-bottom:20px">
+      <label class="field-label">Arti Bahasa Indonesia</label>
+      <input id="cm-meaning" class="field-input" placeholder="makan" oninput="manualFields.meaning=true"/>
+    </div>
+    <div style="display:flex;gap:9px">
+      <button onclick="saveCard()" class="btn-gold" style="flex:1;border-radius:10px">Simpan</button>
+      <button onclick="closeCardModal()" class="btn-ghost">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ══ -->
+<div id="root" style="display:none">
+<div class="container">
+
+  <!-- Header -->
+  <header style="padding-top:2rem;padding-bottom:1.5rem;text-align:center">
+    <img src="https://indrarealpick.github.io/flashcardjp/android_playstore_512.png" alt="Flashcard Jepang"
+      style="width:64px;height:64px;border-radius:16px;margin-bottom:12px;box-shadow:0 6px 20px rgba(0,0,0,0.4);display:block;margin-left:auto;margin-right:auto"
+      onerror="this.style.display='none'"/>
+    <h1 style="font-family:'Noto Serif JP',serif;font-size:clamp(1.6rem,5.5vw,2.4rem);color:#FFF8EE;font-weight:700;line-height:1.2">Flashcard 日本語</h1>
+    <p id="global-count" style="color:rgba(255,248,238,0.28);font-size:0.76rem;margin-top:10px"></p>
+  </header>
+
+  <!-- User bar -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <div class="user-pill">
+      <div class="user-avatar" id="user-initial">?</div>
+      <span id="user-email-display" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+    </div>
+    <button onclick="signOut()" style="font-size:0.68rem;color:rgba(255,248,238,0.32);background:none;border:1px solid rgba(255,255,255,0.07);border-radius:100px;padding:5px 12px;cursor:pointer;transition:all 0.15s" onmouseover="this.style.color='#fca5a5';this.style.borderColor='rgba(248,113,113,0.2)'" onmouseout="this.style.color='rgba(255,248,238,0.32)';this.style.borderColor='rgba(255,255,255,0.07)'">Keluar</button>
+  </div>
+
+<!-- API key handled by Edge Function -->
+
+  <!-- ── HOME VIEW ── -->
+  <div id="view-home">
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;align-items:center">
+      <button onclick="openCategoryModal()" class="btn-gold" style="border-radius:10px;padding:10px 17px;font-size:0.84rem">＋ Kategori</button>
+      <button onclick="openCardModal(null)" class="btn-ghost" style="padding:10px 17px;font-size:0.84rem;font-weight:600">＋ Flashcard</button>
+      <div style="flex:1"></div>
+      <button onclick="exportAll()" style="padding:8px 12px;border-radius:9px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,248,238,0.35);font-size:0.76rem;cursor:pointer;font-weight:500">↓ Export</button>
+      <button onclick="document.getElementById('import-file').click()" style="padding:8px 12px;border-radius:9px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,248,238,0.35);font-size:0.76rem;cursor:pointer;font-weight:500">↑ Import</button>
+      <input id="import-file" type="file" accept=".json" onchange="importAll(event)" style="display:none"/>
+    </div>
+    <div id="category-grid"></div>
+    <div id="home-empty" style="display:none;text-align:center;padding:5rem 0">
+      <div style="font-family:'Noto Serif JP',serif;font-size:3.5rem;margin-bottom:14px;opacity:0.1;color:#FFF8EE">空</div>
+      <p style="font-size:0.88rem;color:rgba(255,248,238,0.28);font-weight:500">Belum ada kategori</p>
+      <p style="font-size:0.72rem;margin-top:7px;color:rgba(255,248,238,0.16)">Mulai dengan klik "＋ Kategori"</p>
+    </div>
+  </div>
+
+  <!-- ── CATEGORY VIEW ── -->
+  <div id="view-category" style="display:none">
+    <button class="breadcrumb-btn" onclick="goHome()">‹ Semua Kategori</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:11px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div id="cat-view-icon" style="width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0"></div>
+        <div>
+          <h2 id="cat-view-name" style="font-family:'Noto Sans JP',sans-serif;font-size:1.3rem;color:#FFF8EE;font-weight:700;line-height:1.2"></h2>
+          <p id="cat-view-count" style="font-size:0.7rem;color:rgba(255,248,238,0.3);margin-top:2px"></p>
+        </div>
+      </div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap">
+        <button onclick="openCardModal(null)" class="btn-gold" style="padding:8px 14px;font-size:0.78rem;border-radius:9px">＋ Flashcard</button>
+        <button onclick="openStudy()" style="padding:8px 14px;border-radius:9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,248,238,0.72);font-weight:600;font-size:0.78rem;cursor:pointer">▶ Belajar</button>
+        <button onclick="editCurrentCategory()" style="width:34px;height:34px;border-radius:9px;background:rgba(232,177,93,0.08);border:1px solid rgba(232,177,93,0.18);color:#E8B15D;cursor:pointer;font-size:0.82rem;display:flex;align-items:center;justify-content:center">✏</button>
+        <button onclick="deleteCurrentCategory()" id="del-cat-btn" data-confirm="0" style="width:34px;height:34px;border-radius:9px;background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.15);color:#f87171;cursor:pointer;font-size:0.82rem;display:flex;align-items:center;justify-content:center">🗑</button>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <input id="cat-search" class="search-input" oninput="renderCategoryView()" placeholder="Cari flashcard..."/>
+    </div>
+    <div id="cat-cards-list"></div>
+    <div id="cat-empty" style="display:none;text-align:center;padding:4rem 0">
+      <div style="font-size:2rem;margin-bottom:10px;opacity:0.2">📭</div>
+      <p style="font-size:0.85rem;color:rgba(255,248,238,0.28);font-weight:500">Belum ada flashcard</p>
+      <p style="font-size:0.7rem;margin-top:6px;color:rgba(255,248,238,0.16)">Klik "＋ Flashcard" untuk menambahkan</p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- Loading screen -->
+<div id="loading-screen" style="display:none;position:fixed;inset:0;z-index:70;background:#06091C;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+  <div class="spinner"></div>
+  <p style="font-size:0.75rem;color:rgba(255,248,238,0.28);letter-spacing:1px">Memuat...</p>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ═══════════════════════════════════════
+//  SUPABASE CONFIG
+// ═══════════════════════════════════════
+const SUPABASE_URL = 'https://koffnxhfonpuzktkprxd.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_jJlJF9IAfzsDr-uwN7bkdQ_hw2Gzryl';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: false,
+    storageKey: 'jp-flashcard-auth',
+    storage: window.localStorage
+  }
+});
+
+// ═══════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════
+const CACHE_KEY     = 'jp_translate_cache_v1';
+
+const PALETTE=[
+  {color:'#E8B15D',bg:'rgba(232,177,93,0.13)',icon:'⭐'},
+  {color:'#7eb5e8',bg:'rgba(126,181,232,0.13)',icon:'🌊'},
+  {color:'#a78bfa',bg:'rgba(167,139,250,0.13)',icon:'🔮'},
+  {color:'#6ee7b7',bg:'rgba(110,231,183,0.13)',icon:'🌿'},
+  {color:'#f87171',bg:'rgba(248,113,113,0.13)',icon:'🔥'},
+  {color:'#fb923c',bg:'rgba(251,146,60,0.13)', icon:'🍊'},
+  {color:'#e879f9',bg:'rgba(232,121,249,0.13)',icon:'🌸'},
+  {color:'#38bdf8',bg:'rgba(56,189,248,0.13)', icon:'❄️'},
+  {color:'#facc15',bg:'rgba(250,204,21,0.13)', icon:'⚡'},
+  {color:'#4ade80',bg:'rgba(74,222,128,0.13)', icon:'🎋'},
+  {color:'#f0abfc',bg:'rgba(240,171,252,0.13)',icon:'🌺'},
+  {color:'#94a3b8',bg:'rgba(148,163,184,0.13)',icon:'📚'},
+];
+
+// ═══════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════
+let cards=[],categories=[],currentCatId=null,currentUser=null;
+let studyDeck=[],studyIndex=0,studyFlip=false,shuffleOn=false;
+let debounceTimer=null,latestWord='';
+let manualFields={hiragana:false,romaji:false,meaning:false};
+let pendingRequests={},toastTimer=null,selectedPaletteIdx=0;
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+async function init(){
+  buildColorPicker();
+  document.addEventListener('keydown',handleKeydown);
+
+  // API key handled server-side
+
+  // Safety timeout — if loading stuck, show auth screen
+  const loadTimeout = setTimeout(()=>{
+    showLoading(false);
+    document.getElementById('auth-screen').classList.add('active');
+  }, 5000);
+
+  try {
+    // Check existing session
+    const {data:{session}, error} = await sb.auth.getSession();
+    clearTimeout(loadTimeout);
+
+    if(session && session.user){
+      currentUser = session.user;
+      showLoading(true);
+      await enterApp();
+    } else {
+      showLoading(false);
+      document.getElementById('auth-screen').classList.add('active');
+    }
+  } catch(e) {
+    clearTimeout(loadTimeout);
+    showLoading(false);
+    document.getElementById('auth-screen').classList.add('active');
+  }
+
+  // Listen for auth state changes
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if(event === 'TOKEN_REFRESHED' && session){
+      currentUser = session.user;
+    }
+    if(event === 'SIGNED_OUT'){
+      currentUser = null;
+      cards=[];categories=[];
+      document.getElementById('root').style.display='none';
+      showLoading(false);
+      document.getElementById('auth-screen').classList.add('active');
+      resetAuthForm();
+    }
+  });
+}
+
+async function enterApp(){
+  showLoading(true);
+  try {
+    // Set user info
+    const email = currentUser.email || '';
+    document.getElementById('user-email-display').textContent = email;
+    document.getElementById('user-initial').textContent = email.charAt(0).toUpperCase();
+    // Load data
+    await Promise.all([loadCategories(), loadCards()]);
+    document.getElementById('root').style.display='block';
+    renderHome();
+  } catch(e) {
+    showToast('Gagal memuat data: '+e.message, 'err');
+  } finally {
+    showLoading(false);
+  }
+}
+
+function showLoading(show){
+  const el=document.getElementById('loading-screen');
+  el.style.display=show?'flex':'none';
+  // Safety: auto-hide after 8 seconds
+  if(show){
+    clearTimeout(window._loadTimer);
+    window._loadTimer=setTimeout(()=>{
+      el.style.display='none';
+      if(!currentUser){
+        document.getElementById('auth-screen').classList.add('active');
+      }
+    },8000);
+  } else {
+    clearTimeout(window._loadTimer);
+  }
+}
+
+// ═══════════════════════════════════════
+//  AUTH
+// ═══════════════════════════════════════
+let authMode = 'login'; // 'login' | 'register'
+
+function switchTab(mode){
+  authMode = mode;
+  const isReg = mode === 'register';
+  const tabLogin    = document.getElementById('tab-login');
+  const tabRegister = document.getElementById('tab-register');
+  const confirmWrap = document.getElementById('confirm-pw-wrap');
+  const submitBtn   = document.getElementById('auth-submit-btn');
+
+  const activeStyle  = 'flex:1;padding:8px;border-radius:8px;border:none;font-size:0.8rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;transition:all 0.18s;background:linear-gradient(180deg,#F0C06A,#DDA64C);color:#0D0F18;box-shadow:0 2px 8px rgba(232,177,93,0.25)';
+  const inactiveStyle = 'flex:1;padding:8px;border-radius:8px;border:none;font-size:0.8rem;font-weight:600;letter-spacing:0.5px;cursor:pointer;transition:all 0.18s;background:transparent;color:rgba(255,248,238,0.4)';
+
+  tabLogin.style.cssText    = isReg ? inactiveStyle : activeStyle;
+  tabRegister.style.cssText = isReg ? activeStyle   : inactiveStyle;
+  confirmWrap.style.display = isReg ? 'block' : 'none';
+  submitBtn.textContent     = isReg ? 'Daftar' : 'Masuk';
+
+  // Clear errors
+  setAuthError('');
+}
+
+function setAuthError(msg){
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+function setAuthLoading(loading){
+  const btn = document.getElementById('auth-submit-btn');
+  btn.disabled = loading;
+  btn.textContent = loading ? 'Memuat...' : (authMode === 'register' ? 'Daftar' : 'Masuk');
+  btn.style.opacity = loading ? '0.7' : '1';
+}
+
+function toggleAuthPw(){
+  const i = document.getElementById('auth-password');
+  const b = document.getElementById('auth-pw-eye');
+  i.type = i.type === 'password' ? 'text' : 'password';
+  b.textContent = i.type === 'password' ? '👁' : '🙈';
+}
+
+function toggleAuthConfirmPw(){
+  const i = document.getElementById('auth-confirm-password');
+  const b = document.getElementById('auth-confirm-eye');
+  i.type = i.type === 'password' ? 'text' : 'password';
+  b.textContent = i.type === 'password' ? '👁' : '🙈';
+}
+
+async function submitAuth(){
+  const email    = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+
+  if(!email)    { setAuthError('Email tidak boleh kosong'); return }
+  if(!password) { setAuthError('Password tidak boleh kosong'); return }
+  if(password.length < 6) { setAuthError('Password minimal 6 karakter'); return }
+
+  if(authMode === 'register'){
+    const confirm = document.getElementById('auth-confirm-password').value;
+    if(password !== confirm){ setAuthError('Password tidak cocok'); return }
+  }
+
+  setAuthLoading(true);
+  setAuthError('');
+
+  try {
+    if(authMode === 'register'){
+      const {data, error} = await sb.auth.signUp({email, password});
+      if(error) throw error;
+      // signUp sudah auto login jika confirm email off
+      if(data.session){
+        currentUser = data.session.user;
+        document.getElementById('auth-screen').classList.remove('active');
+        showLoading(true);
+        await enterApp();
+      } else {
+        // Fallback: manual login
+        const {data:d2, error:e2} = await sb.auth.signInWithPassword({email, password});
+        if(e2) { setAuthError('Daftar berhasil, silakan login'); switchTab('login'); return; }
+        currentUser = d2.user;
+        document.getElementById('auth-screen').classList.remove('active');
+        showLoading(true);
+        await enterApp();
+      }
+    } else {
+      const {data, error} = await sb.auth.signInWithPassword({email, password});
+      if(error) throw error;
+      currentUser = data.user;
+      document.getElementById('auth-screen').classList.remove('active');
+      showLoading(true);
+      await enterApp();
+    }
+  } catch(e){
+    const msg = e.message || 'Terjadi kesalahan';
+    if(msg.includes('Invalid login credentials')) setAuthError('Email atau password salah');
+    else if(msg.includes('already registered')) setAuthError('Email sudah terdaftar, silakan masuk');
+    else if(msg.includes('Email not confirmed')) setAuthError('Email belum dikonfirmasi — hubungi admin');
+    else if(msg.includes('User already registered')) { setAuthError('Email sudah terdaftar'); switchTab('login'); }
+    else setAuthError(msg);
+  } finally {
+    setAuthLoading(false);
+  }
+}
+
+function resetAuthForm(){
+  document.getElementById('auth-email').value = '';
+  document.getElementById('auth-password').value = '';
+  document.getElementById('auth-confirm-password').value = '';
+  setAuthError('');
+  switchTab('login');
+}
+
+async function signOut(){
+  await sb.auth.signOut();
+  showToast('Sampai jumpa! 👋');
+}
+
+// ═══════════════════════════════════════
+//  DATA — Supabase
+// ═══════════════════════════════════════
+async function loadCategories(){
+  const {data,error}=await sb.from('categories').select('*').order('created_at');
+  if(!error) categories=data.map(c=>({...c,id:Number(c.id)}));
+}
+async function loadCards(){
+  const {data,error}=await sb.from('flashcards').select('*').order('created_at');
+  if(!error) cards=data.map(c=>({...c,id:Number(c.id),categoryId:Number(c.category_id)}));
+}
+
+async function dbSaveCategory(cat){
+  const row={id:cat.id,user_id:currentUser.id,name:cat.name,color:cat.color,bg:cat.bg,icon:cat.icon};
+  const {error}=await sb.from('categories').upsert(row);
+  if(error) throw error;
+}
+async function dbDeleteCategory(id){
+  const {error}=await sb.from('categories').delete().eq('id',id);
+  if(error) throw error;
+}
+async function dbSaveCard(card){
+  const row={id:card.id,user_id:currentUser.id,japanese:card.japanese,reading:card.reading,reading_hiragana:card.reading_hiragana,reading_romaji:card.reading_romaji,meaning:card.meaning,ai_detected:card.aiDetected,category_id:card.categoryId||null};
+  const {error}=await sb.from('flashcards').upsert(row);
+  if(error) throw error;
+}
+async function dbDeleteCard(id){
+  const {error}=await sb.from('flashcards').delete().eq('id',id);
+  if(error) throw error;
+}
+
+// ═══════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════
+function showToast(msg,type='ok'){
+  const t=document.getElementById('toast');t.textContent=msg;t.className='show '+type;
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.className='',2800);
+}
+
+// ═══════════════════════════════════════
+//  API KEY
+// ═══════════════════════════════════════
+function toggleApiPanel(){const p=document.getElementById('api-panel');p.style.display=p.style.display==='none'?'block':'none'}
+
+
+
+
+// ═══════════════════════════════════════
+//  COLOR PICKER
+// ═══════════════════════════════════════
+function buildColorPicker(){
+  document.getElementById('color-picker').innerHTML=PALETTE.map((p,i)=>
+    `<button type="button" class="cp-btn" id="cp-${i}" onclick="selectPalette(${i})" style="background:${p.bg};border-color:${i===0?p.color:'transparent'}">${p.icon}</button>`
+  ).join('');
+}
+function selectPalette(i){
+  document.getElementById('cp-'+selectedPaletteIdx).style.borderColor='transparent';
+  selectedPaletteIdx=i;
+  document.getElementById('cp-'+i).style.borderColor=PALETTE[i].color;
+}
+
+// ═══════════════════════════════════════
+//  CATEGORY MODAL
+// ═══════════════════════════════════════
+function openCategoryModal(cat){
+  document.getElementById('modal-cat-id').value=cat?cat.id:'';
+  document.getElementById('modal-cat-name').value=cat?cat.name:'';
+  document.getElementById('modal-cat-title').textContent=cat?'✏ Edit Kategori':'＋ Buat Kategori';
+  selectPalette(cat?Math.max(0,PALETTE.findIndex(p=>p.color===cat.color)):Math.floor(Math.random()*PALETTE.length));
+  document.getElementById('modal-cat').classList.add('open');
+  setTimeout(()=>document.getElementById('modal-cat-name').focus(),80);
+}
+function closeCatModal(){document.getElementById('modal-cat').classList.remove('open')}
+async function saveCategory(){
+  const name=document.getElementById('modal-cat-name').value.trim();
+  if(!name){showToast('Nama kategori tidak boleh kosong','err');return}
+  const p=PALETTE[selectedPaletteIdx],editId=document.getElementById('modal-cat-id').value;
+  const id=editId?Number(editId):Date.now();
+  const cat={id,name,color:p.color,bg:p.bg,icon:p.icon};
+  try{
+    await dbSaveCategory(cat);
+    if(editId){categories=categories.map(c=>c.id===id?{...c,...cat}:c);showToast('Kategori diperbarui')}
+    else{categories.push(cat);showToast('Kategori "'+name+'" dibuat')}
+    closeCatModal();renderHome();if(currentCatId)renderCategoryHeader();
+  }catch(e){showToast('Gagal menyimpan: '+e.message,'err')}
+}
+document.getElementById('modal-cat').addEventListener('click',function(e){if(e.target===this)closeCatModal()});
+
+// ═══════════════════════════════════════
+//  CARD MODAL
+// ═══════════════════════════════════════
+function openCardModal(card,forceCatId){
+  document.getElementById('cm-edit-id').value=card?card.id:'';
+  document.getElementById('cm-japanese').value=card?card.japanese:'';
+  document.getElementById('cm-hiragana').value=card?(card.reading_hiragana||''):'';
+  document.getElementById('cm-romaji').value=card?(card.reading_romaji||''):'';
+  document.getElementById('cm-meaning').value=card?card.meaning:'';
+  document.getElementById('modal-card-title').textContent=card?'✏ Edit Flashcard':'＋ Tambah Flashcard';
+  manualFields={hiragana:!!card,romaji:!!card,meaning:!!card};latestWord='';clearTimeout(debounceTimer);setAIStatus('idle');
+  const sel=document.getElementById('cm-category');
+  sel.innerHTML=categories.map(c=>`<option value="${c.id}">${c.icon} ${esc(c.name)}</option>`).join('');
+  const tc=forceCatId||currentCatId||(card&&card.categoryId)||(categories[0]&&categories[0].id);
+  if(tc)sel.value=tc;
+  document.getElementById('modal-card').classList.add('open');
+  setTimeout(()=>document.getElementById('cm-japanese').focus(),80);
+}
+function closeCardModal(){
+  document.getElementById('modal-card').classList.remove('open');
+  latestWord='';clearTimeout(debounceTimer);setAIStatus('idle');
+}
+document.getElementById('modal-card').addEventListener('click',function(e){if(e.target===this)closeCardModal()});
+async function saveCard(){
+  const jp=document.getElementById('cm-japanese').value.trim();
+  const mean=document.getElementById('cm-meaning').value.trim();
+  if(!jp||!mean){showToast('Kata Jepang dan arti wajib diisi','err');return}
+  const catId=Number(document.getElementById('cm-category').value);
+  const hira=document.getElementById('cm-hiragana').value.trim();
+  const roma=document.getElementById('cm-romaji').value.trim();
+  const aiOk=document.getElementById('ai-badge').textContent.includes('AI');
+  const editId=document.getElementById('cm-edit-id').value;
+  const id=editId?Number(editId):Date.now();
+  const cardData={id,japanese:jp,reading:[hira,roma].filter(Boolean).join(' · '),reading_hiragana:hira,reading_romaji:roma,meaning:mean,aiDetected:aiOk,categoryId:catId};
+  try{
+    await dbSaveCard(cardData);
+    if(editId){cards=cards.map(c=>c.id===id?{...c,...cardData}:c);showToast('Flashcard diperbarui')}
+    else{cards.push(cardData);showToast('Flashcard ditambahkan')}
+    closeCardModal();
+    if(currentCatId===catId||!currentCatId)renderCategoryView();
+    renderHome();
+  }catch(e){showToast('Gagal menyimpan: '+e.message,'err')}
+}
+
+// ═══════════════════════════════════════
+//  HOME
+// ═══════════════════════════════════════
+function renderHome(){
+  document.getElementById('global-count').textContent=
+    !categories.length?'Belum ada kategori — mulai tambahkan':
+    categories.length+' kategori  ·  '+cards.length+' flashcard';
+  const grid=document.getElementById('category-grid'),empty=document.getElementById('home-empty');
+  if(!categories.length){grid.innerHTML='';empty.style.display='block';return}
+  empty.style.display='none';
+  grid.innerHTML=categories.map(cat=>{
+    const count=cards.filter(c=>c.categoryId===cat.id).length;
+    const prev=cards.filter(c=>c.categoryId===cat.id).slice(0,3)
+      .map(c=>`<span style="font-family:'Noto Serif JP',serif;font-size:0.8rem;color:rgba(255,248,238,0.26);font-weight:700">${esc(c.japanese)}</span>`)
+      .join('<span style="color:rgba(255,255,255,0.1);font-size:0.62rem;margin:0 2px">·</span>');
+    return `<div class="cat-card" onclick="openCategory(${cat.id})">
+      <div style="width:48px;height:48px;border-radius:13px;background:${cat.bg};display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;border:1px solid ${cat.color}22">${cat.icon}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="font-size:0.97rem;color:#FFF8EE;font-weight:600">${esc(cat.name)}</span>
+          <span style="font-size:0.58rem;color:${cat.color};background:${cat.bg};border:1px solid ${cat.color}28;border-radius:5px;padding:2px 7px;font-weight:700">${count} kartu</span>
+        </div>
+        <div style="margin-top:6px;display:flex;gap:3px;flex-wrap:wrap;align-items:center">${prev}${count>3?'<span style="font-size:0.68rem;color:rgba(255,255,255,0.14);margin-left:2px">+'+(count-3)+'</span>':''}</div>
+      </div>
+      <span style="color:rgba(255,248,238,0.16);font-size:0.95rem;flex-shrink:0">›</span>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+//  CATEGORY VIEW
+// ═══════════════════════════════════════
+function openCategory(catId){
+  currentCatId=catId;
+  document.getElementById('view-home').style.display='none';
+  document.getElementById('view-category').style.display='block';
+  document.getElementById('cat-search').value='';
+  renderCategoryHeader();renderCategoryView();
+}
+function goHome(){
+  currentCatId=null;
+  document.getElementById('view-home').style.display='block';
+  document.getElementById('view-category').style.display='none';
+  renderHome();
+}
+function renderCategoryHeader(){
+  const cat=categories.find(c=>c.id===currentCatId);if(!cat)return;
+  const count=cards.filter(c=>c.categoryId===currentCatId).length;
+  const ico=document.getElementById('cat-view-icon');
+  ico.textContent=cat.icon;ico.style.background=cat.bg;ico.style.border='1px solid '+cat.color+'22';
+  document.getElementById('cat-view-name').textContent=cat.name;
+  document.getElementById('cat-view-count').textContent=count+' flashcard tersimpan';
+}
+function renderCategoryView(){
+  if(!currentCatId)return;
+  renderCategoryHeader();
+  const s=(document.getElementById('cat-search').value||'').toLowerCase();
+  const cc=cards.filter(c=>c.categoryId===currentCatId);
+  const f=cc.filter(c=>c.japanese.includes(s)||(c.reading_hiragana||'').toLowerCase().includes(s)||(c.reading_romaji||'').toLowerCase().includes(s)||(c.meaning||'').toLowerCase().includes(s));
+  const list=document.getElementById('cat-cards-list'),empty=document.getElementById('cat-empty');
+  if(!cc.length){list.innerHTML='';empty.style.display='block';return}
+  empty.style.display='none';
+  if(!f.length){list.innerHTML=`<div style="text-align:center;padding:3rem 0;color:rgba(255,248,238,0.2)"><div style="font-size:1.6rem;margin-bottom:8px;opacity:0.35">🔍</div><p style="font-size:0.84rem">Tidak ada hasil untuk "${esc(s)}"</p></div>`;return}
+  list.innerHTML=f.map(card=>`
+    <div class="card-item">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px">
+          <span style="font-family:'Noto Sans JP',sans-serif;font-size:1.5rem;color:#FFF8EE;font-weight:700;line-height:1.2;letter-spacing:0">${esc(card.japanese)}</span>
+          ${card.aiDetected?'<span style="font-size:0.58rem;color:#86efac;background:rgba(134,239,172,0.09);border:1px solid rgba(134,239,172,0.2);border-radius:5px;padding:2px 7px;font-weight:700;letter-spacing:1px">AI</span>':''}
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:3px">
+          ${card.reading_hiragana?`<span style="font-family:'Noto Serif JP',serif;font-size:0.78rem;color:rgba(255,248,238,0.44);letter-spacing:1px">${esc(card.reading_hiragana)}</span>`:''}
+          ${card.reading_hiragana&&card.reading_romaji?'<span style="color:rgba(255,255,255,0.14);font-size:0.62rem">·</span>':''}
+          ${card.reading_romaji?`<span style="font-size:0.72rem;color:rgba(255,248,238,0.28);font-style:italic">${esc(card.reading_romaji)}</span>`:''}
+        </div>
+        <span style="font-size:0.88rem;color:rgba(255,248,238,0.6);font-weight:500">${esc(card.meaning)}</span>
+      </div>
+      <div class="card-actions" style="display:flex;gap:6px;flex-shrink:0">
+        <button onclick="openCardModal(cards.find(c=>c.id===${card.id}))" style="width:33px;height:33px;border-radius:9px;border:1px solid rgba(232,177,93,0.18);background:rgba(232,177,93,0.07);color:#E8B15D;cursor:pointer;font-size:0.8rem;display:flex;align-items:center;justify-content:center">✏</button>
+        <button onclick="confirmDeleteCard(${card.id},this)" data-confirm="0" style="width:33px;height:33px;border-radius:9px;border:1px solid rgba(239,68,68,0.14);background:rgba(239,68,68,0.06);color:#f87171;cursor:pointer;font-size:0.8rem;display:flex;align-items:center;justify-content:center">🗑</button>
+      </div>
+    </div>`).join('');
+}
+async function confirmDeleteCard(id,btn){
+  if(btn.dataset.confirm==='1'){
+    try{
+      await dbDeleteCard(id);
+      cards=cards.filter(c=>c.id!==id);renderCategoryView();renderHome();showToast('Flashcard dihapus');
+    }catch(e){showToast('Gagal menghapus','err')}
+  } else {
+    btn.dataset.confirm='1';btn.textContent='✓';btn.style.background='rgba(239,68,68,0.2)';btn.style.borderColor='rgba(239,68,68,0.4)';
+    setTimeout(()=>{if(btn.dataset.confirm==='1'){btn.dataset.confirm='0';btn.textContent='🗑';btn.style.background='rgba(239,68,68,0.06)';btn.style.borderColor='rgba(239,68,68,0.14)'}},2500);
+  }
+}
+function editCurrentCategory(){const cat=categories.find(c=>c.id===currentCatId);if(cat)openCategoryModal(cat)}
+async function deleteCurrentCategory(){
+  const btn=document.getElementById('del-cat-btn');
+  if(btn.dataset.confirm==='1'){
+    try{
+      await dbDeleteCategory(currentCatId);
+      const n=cards.filter(c=>c.categoryId===currentCatId).length;
+      cards=cards.filter(c=>c.categoryId!==currentCatId);
+      categories=categories.filter(c=>c.id!==currentCatId);
+      showToast('Kategori dihapus ('+n+' kartu ikut dihapus)');goHome();
+    }catch(e){showToast('Gagal menghapus','err')}
+  } else {
+    btn.dataset.confirm='1';btn.textContent='✓';btn.style.background='rgba(239,68,68,0.2)';btn.style.borderColor='rgba(239,68,68,0.4)';
+    setTimeout(()=>{if(btn.dataset.confirm==='1'){btn.dataset.confirm='0';btn.textContent='🗑';btn.style.background='rgba(239,68,68,0.07)';btn.style.borderColor='rgba(239,68,68,0.15)'}},2500);
+  }
+}
+
+// ═══════════════════════════════════════
+//  IMPORT / EXPORT
+// ═══════════════════════════════════════
+function exportAll(){
+  if(!cards.length&&!categories.length){showToast('Tidak ada data','err');return}
+  const blob=new Blob([JSON.stringify({categories,cards},null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='flashcards-jp-'+Date.now()+'.json';a.click();URL.revokeObjectURL(url);showToast('Export berhasil');
+}
+async function importAll(e){
+  const file=e.target.files[0];if(!file)return;
+  showLoading(true);
+  const r=new FileReader();
+  r.onload=async ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      let cats=[],cds=[];
+      if(d.categories&&d.cards){cats=d.categories;cds=d.cards}
+      else if(Array.isArray(d)){cds=d}
+      else throw new Error();
+      // Upsert all
+      for(const cat of cats){await dbSaveCategory({...cat,id:cat.id||Date.now()})}
+      for(const card of cds){await dbSaveCard({...card,id:card.id||Date.now(),categoryId:card.categoryId||card.category_id||null})}
+      await Promise.all([loadCategories(),loadCards()]);
+      renderHome();showToast('Import berhasil! '+cats.length+' kategori, '+cds.length+' kartu');
+    }catch{showToast('Format file tidak valid','err')}
+    showLoading(false);
+  };r.readAsText(file);e.target.value='';
+}
+
+// ═══════════════════════════════════════
+//  AI TRANSLATE
+// ═══════════════════════════════════════
+const EDGE_URL = 'https://koffnxhfonpuzktkprxd.supabase.co/functions/v1/smart-processor';
+
+const loadCache=()=>{try{return JSON.parse(localStorage.getItem(CACHE_KEY)||'{}')}catch{return{}}};
+const saveCache=c=>{try{localStorage.setItem(CACHE_KEY,JSON.stringify(c))}catch{}};
+
+function parseAIResult(raw){
+  let t=raw.replace(/```json([\s\S]*?)```/g,'$1').replace(/```([\s\S]*?)```/g,'$1').trim();
+  const p=JSON.parse(t);
+  if(typeof p.reading_hiragana!=='string'||typeof p.reading_romaji!=='string'||typeof p.meaning_id!=='string')throw new Error('Missing fields');
+  return{reading_hiragana:p.reading_hiragana.trim(),reading_romaji:p.reading_romaji.trim(),meaning_id:p.meaning_id.trim()};
+}
+
+async function translateJapanese(word){
+  const key=word.trim(),cache=loadCache();
+  if(cache[key])return{...cache[key],fromCache:true};
+  if(pendingRequests[key])return pendingRequests[key];
+  const promise=(async()=>{
+    try{
+      // Get current session token for auth
+      const {data:{session}} = await sb.auth.getSession();
+      const token = session?.access_token || '';
+      const res=await fetch(EDGE_URL,{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization':'Bearer '+token
+        },
+        body:JSON.stringify({word:key})
+      });
+      if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err?.error||'HTTP '+res.status)}
+      const raw=await res.text();
+      if(!raw)throw new Error('Respons kosong');
+      const result=parseAIResult(raw);
+      const fresh=loadCache();fresh[key]=result;saveCache(fresh);
+      return{...result,fromCache:false};
+    }finally{delete pendingRequests[key]}
+  })();
+  pendingRequests[key]=promise;return promise;
+}
+function setAIStatus(status,msg='',fromCache=false){
+  const el=document.getElementById('ai-status'),badge=document.getElementById('ai-badge');
+  const retry=document.getElementById('ai-retry-btn'),errMsg=document.getElementById('ai-error-msg');
+  const filling=document.getElementById('ai-filling');
+  el.style.display=status==='idle'?'none':'flex';
+  filling.style.display=status==='loading'?'inline':'none';
+  retry.style.display=status==='error'?'inline-block':'none';
+  errMsg.style.display=status==='error'?'block':'none';
+  if(status==='error')errMsg.textContent=msg;
+  const map={
+    loading:{l:'⟳ Menerjemahkan...',c:'rgba(126,181,232,0.9)',bg:'rgba(126,181,232,0.09)',b:'rgba(126,181,232,0.2)'},
+    success:{l:fromCache?'✦ AI (cached)':'✦ AI detected',c:'#86efac',bg:'rgba(134,239,172,0.08)',b:'rgba(134,239,172,0.22)'},
+    error:  {l:'✕ Gagal',c:'#fca5a5',bg:'rgba(252,165,165,0.08)',b:'rgba(252,165,165,0.2)'},
+  };
+  if(map[status]){const c=map[status];badge.textContent=c.l;badge.style.color=c.c;badge.style.background=c.bg;badge.style.border='1px solid '+c.b}
+}
+function onJapaneseInput(val){
+  manualFields={hiragana:false,romaji:false,meaning:false};setAIStatus('idle');
+  if(!val.trim())return;
+  clearTimeout(debounceTimer);latestWord=val;setAIStatus('loading');
+  debounceTimer=setTimeout(()=>{
+    if(latestWord!==val)return;
+    translateJapanese(val)
+      .then(r=>{if(latestWord!==val)return;setAIStatus('success','',r.fromCache);
+        if(!manualFields.hiragana)document.getElementById('cm-hiragana').value=r.reading_hiragana;
+        if(!manualFields.romaji)document.getElementById('cm-romaji').value=r.reading_romaji;
+        if(!manualFields.meaning)document.getElementById('cm-meaning').value=r.meaning_id;})
+      .catch(e=>{if(latestWord!==val)return;setAIStatus('error',e.message||'Gagal')});
+  },500);
+}
+function retryTranslate(){
+  const w=document.getElementById('cm-japanese').value.trim();if(!w)return;
+  const c=loadCache();delete c[w];saveCache(c);manualFields={hiragana:false,romaji:false,meaning:false};latestWord='';onJapaneseInput(w);
+}
+
+// ═══════════════════════════════════════
+//  STUDY MODE
+// ═══════════════════════════════════════
+function openStudy(){
+  const cc=currentCatId?cards.filter(c=>c.categoryId===currentCatId):cards;
+  if(!cc.length)return;
+  shuffleOn=false;studyDeck=[...cc];studyIndex=0;studyFlip=false;
+  const sb2=document.getElementById('shuffle-btn');sb2.style.color='rgba(255,248,238,0.38)';sb2.style.background='rgba(255,255,255,0.04)';sb2.style.borderColor='rgba(255,255,255,0.08)';
+  const cat=currentCatId?categories.find(c=>c.id===currentCatId):null;
+  document.getElementById('study-cat-label').textContent=cat?cat.icon+' '+cat.name:'全カード';
+  document.getElementById('study-overlay').classList.add('active');updateStudyCard();
+}
+function closeStudy(){document.getElementById('study-overlay').classList.remove('active');studyFlip=false}
+function updateStudyCard(){
+  const c=studyDeck[studyIndex];if(!c)return;
+  document.getElementById('study-jp').textContent=c.japanese;
+  document.getElementById('study-hira').textContent=c.reading_hiragana||'';
+  document.getElementById('study-roma').textContent=c.reading_romaji||'';
+  document.getElementById('study-mean').textContent=c.meaning||'';
+  document.getElementById('study-counter').textContent=(studyIndex+1)+' / '+studyDeck.length;
+  document.getElementById('study-prog').style.width=((studyIndex+1)/studyDeck.length*100)+'%';
+  document.getElementById('flip-inner').classList.remove('flipped');
+  studyFlip=false;document.getElementById('flip-btn').textContent='Lihat Arti';
+}
+function flipCard(){studyFlip=!studyFlip;document.getElementById('flip-inner').classList.toggle('flipped',studyFlip);document.getElementById('flip-btn').textContent=studyFlip?'Sembunyikan':'Lihat Arti'}
+function studyNext(){studyIndex=(studyIndex+1)%studyDeck.length;updateStudyCard()}
+function studyPrev(){studyIndex=(studyIndex-1+studyDeck.length)%studyDeck.length;updateStudyCard()}
+function toggleShuffle(){
+  shuffleOn=!shuffleOn;const btn=document.getElementById('shuffle-btn');
+  if(shuffleOn){studyDeck=[...studyDeck].sort(()=>Math.random()-0.5);btn.style.color='#E8B15D';btn.style.background='rgba(232,177,93,0.1)';btn.style.borderColor='rgba(232,177,93,0.25)'}
+  else{studyDeck=[...(currentCatId?cards.filter(c=>c.categoryId===currentCatId):cards)];btn.style.color='rgba(255,248,238,0.38)';btn.style.background='rgba(255,255,255,0.04)';btn.style.borderColor='rgba(255,255,255,0.08)'}
+  studyIndex=0;updateStudyCard();
+}
+function handleKeydown(e){
+  if(!document.getElementById('study-overlay').classList.contains('active'))return;
+  if(e.key==='ArrowLeft')studyPrev();
+  if(e.key==='ArrowRight')studyNext();
+  if(e.key===' '){e.preventDefault();flipCard()}
+  if(e.key==='Escape')closeStudy();
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+init();
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js')
+      .then(r => console.log('SW registered'))
+      .catch(e => console.log('SW failed:', e));
+  });
+}
+</script>
+</body>
+</html>
