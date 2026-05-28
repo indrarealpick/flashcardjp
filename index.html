@@ -313,22 +313,7 @@ select option{background:#0D1526;color:#FFF8EE}
     <button onclick="signOut()" style="font-size:0.68rem;color:rgba(255,248,238,0.32);background:none;border:1px solid rgba(255,255,255,0.07);border-radius:100px;padding:5px 12px;cursor:pointer;transition:all 0.15s" onmouseover="this.style.color='#fca5a5';this.style.borderColor='rgba(248,113,113,0.2)'" onmouseout="this.style.color='rgba(255,248,238,0.32)';this.style.borderColor='rgba(255,255,255,0.07)'">Keluar</button>
   </div>
 
-  <!-- API Key -->
-  <div style="text-align:center;margin-bottom:20px">
-    <button id="api-toggle-btn" onclick="toggleApiPanel()" style="font-size:0.66rem;color:#fca5a5;background:rgba(252,165,165,0.06);border:1px solid rgba(252,165,165,0.2);border-radius:100px;padding:6px 14px;cursor:pointer;letter-spacing:1.2px;text-transform:uppercase;font-weight:600">⚠ Konfigurasi API Key</button>
-  </div>
-  <div id="api-panel" style="display:none;background:rgba(232,177,93,0.04);border:1px solid rgba(232,177,93,0.14);border-radius:13px;padding:15px 17px;margin-bottom:22px">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-      <span style="font-size:0.65rem;color:#E8B15D;letter-spacing:2px;text-transform:uppercase;font-weight:700">⚙ OpenRouter API Key</span>
-      <span id="api-configured-badge" style="display:none;font-size:0.58rem;color:#86efac;background:rgba(134,239,172,0.1);border:1px solid rgba(134,239,172,0.22);border-radius:6px;padding:2px 8px;font-weight:700">Aktif</span>
-    </div>
-    <div style="display:flex;gap:8px">
-      <input id="api-key-input" type="password" placeholder="sk-or-v1-..." style="flex:1;background:#131F38;border:1px solid rgba(255,255,255,0.1);border-radius:9px;color:#FFF8EE;padding:9px 12px;font-size:0.8rem;outline:none;font-family:monospace"/>
-      <button onclick="toggleApiVisible()" id="api-eye-btn" style="width:36px;border-radius:9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,248,238,0.45);cursor:pointer;font-size:0.88rem">👁</button>
-      <button onclick="saveApiKey()" class="btn-gold" style="padding:9px 14px;font-size:0.78rem;border-radius:9px">Simpan</button>
-    </div>
-    <p style="font-size:0.62rem;color:rgba(255,248,238,0.22);margin-top:8px;line-height:1.7">Disimpan di browser. Tidak dikirim kecuali ke OpenRouter.</p>
-  </div>
+<!-- API key handled by Edge Function -->
 
   <!-- ── HOME VIEW ── -->
   <div id="view-home">
@@ -408,9 +393,6 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
 // ═══════════════════════════════════════
 //  CONSTANTS
 // ═══════════════════════════════════════
-const OR_ENDPOINT   = 'https://openrouter.ai/api/v1/chat/completions';
-const OR_MODEL      = 'openai/gpt-4o-mini';
-const API_KEY_STORE = 'jp_openrouter_apikey';
 const CACHE_KEY     = 'jp_translate_cache_v1';
 
 const PALETTE=[
@@ -444,9 +426,7 @@ async function init(){
   buildColorPicker();
   document.addEventListener('keydown',handleKeydown);
 
-  // API key
-  const k=localStorage.getItem(API_KEY_STORE)||'';
-  if(k){document.getElementById('api-key-input').value=k;updateApiBtn(k)}
+  // API key handled server-side
 
   // Safety timeout — if loading stuck, show auth screen
   const loadTimeout = setTimeout(()=>{
@@ -687,17 +667,9 @@ function showToast(msg,type='ok'){
 //  API KEY
 // ═══════════════════════════════════════
 function toggleApiPanel(){const p=document.getElementById('api-panel');p.style.display=p.style.display==='none'?'block':'none'}
-function toggleApiVisible(){const i=document.getElementById('api-key-input'),b=document.getElementById('api-eye-btn');i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'👁':'🙈'}
-function saveApiKey(){
-  const v=document.getElementById('api-key-input').value.trim();if(!v)return;
-  localStorage.setItem(API_KEY_STORE,v);updateApiBtn(v);showToast('API key disimpan ✓');
-  document.getElementById('api-panel').style.display='none';
-}
-function updateApiBtn(key){
-  const b=document.getElementById('api-toggle-btn'),badge=document.getElementById('api-configured-badge');
-  if(key){b.style.cssText='font-size:0.66rem;color:#86efac;background:rgba(134,239,172,0.06);border:1px solid rgba(134,239,172,0.2);border-radius:100px;padding:6px 14px;cursor:pointer;letter-spacing:1.2px;text-transform:uppercase;font-weight:600';b.textContent='⚙ API Key Aktif';badge.style.display='inline-block'}
-  else{b.style.cssText='font-size:0.66rem;color:#fca5a5;background:rgba(252,165,165,0.06);border:1px solid rgba(252,165,165,0.2);border-radius:100px;padding:6px 14px;cursor:pointer;letter-spacing:1.2px;text-transform:uppercase;font-weight:600';b.textContent='⚠ Konfigurasi API Key';badge.style.display='none'}
-}
+
+
+
 
 // ═══════════════════════════════════════
 //  COLOR PICKER
@@ -928,10 +900,7 @@ async function importAll(e){
 // ═══════════════════════════════════════
 //  AI TRANSLATE
 // ═══════════════════════════════════════
-const SYSTEM_PROMPT=`Kamu adalah asisten linguistik Jepang. Tugasmu HANYA mengembalikan JSON valid tanpa penjelasan apapun.
-Format output:
-{"reading_hiragana":"<hiragana>","reading_romaji":"<romaji>","meaning_id":"<arti bahasa Indonesia, maks 5 kata>"}
-Jangan tambahkan teks apapun di luar JSON.`;
+const EDGE_URL = 'https://koffnxhfonpuzktkprxd.supabase.co/functions/v1/translate-jp';
 
 const loadCache=()=>{try{return JSON.parse(localStorage.getItem(CACHE_KEY)||'{}')}catch{return{}}};
 const saveCache=c=>{try{localStorage.setItem(CACHE_KEY,JSON.stringify(c))}catch{}};
@@ -942,19 +911,29 @@ function parseAIResult(raw){
   if(typeof p.reading_hiragana!=='string'||typeof p.reading_romaji!=='string'||typeof p.meaning_id!=='string')throw new Error('Missing fields');
   return{reading_hiragana:p.reading_hiragana.trim(),reading_romaji:p.reading_romaji.trim(),meaning_id:p.meaning_id.trim()};
 }
+
 async function translateJapanese(word){
-  const ak=localStorage.getItem(API_KEY_STORE)||'';if(!ak)throw new Error('API key belum dikonfigurasi');
   const key=word.trim(),cache=loadCache();
   if(cache[key])return{...cache[key],fromCache:true};
   if(pendingRequests[key])return pendingRequests[key];
   const promise=(async()=>{
     try{
-      const res=await fetch(OR_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ak,'HTTP-Referer':location.origin,'X-Title':'JP Flashcard'},
-        body:JSON.stringify({model:OR_MODEL,max_tokens:150,temperature:0,messages:[{role:'system',content:SYSTEM_PROMPT},{role:'user',content:'Terjemahkan: '+key}]})});
-      if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err?.error?.message||'HTTP '+res.status)}
-      const data=await res.json();const raw=data?.choices?.[0]?.message?.content;
+      // Get current session token for auth
+      const {data:{session}} = await sb.auth.getSession();
+      const token = session?.access_token || '';
+      const res=await fetch(EDGE_URL,{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization':'Bearer '+token
+        },
+        body:JSON.stringify({word:key})
+      });
+      if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err?.error||'HTTP '+res.status)}
+      const raw=await res.text();
       if(!raw)throw new Error('Respons kosong');
-      const result=parseAIResult(raw);const fresh=loadCache();fresh[key]=result;saveCache(fresh);
+      const result=parseAIResult(raw);
+      const fresh=loadCache();fresh[key]=result;saveCache(fresh);
       return{...result,fromCache:false};
     }finally{delete pendingRequests[key]}
   })();
