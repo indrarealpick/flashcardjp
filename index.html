@@ -473,14 +473,6 @@ async function init(){
 
   // Listen for auth state changes
   sb.auth.onAuthStateChange(async (event, session) => {
-    if(event === 'SIGNED_IN' && session){
-      if(!currentUser || currentUser.id !== session.user.id){
-        currentUser = session.user;
-        document.getElementById('auth-screen').classList.remove('active');
-        showLoading(true);
-        await enterApp();
-      }
-    }
     if(event === 'TOKEN_REFRESHED' && session){
       currentUser = session.user;
     }
@@ -600,23 +592,37 @@ async function submitAuth(){
 
   try {
     if(authMode === 'register'){
-      const {error} = await sb.auth.signUp({email, password});
+      const {data, error} = await sb.auth.signUp({email, password});
       if(error) throw error;
-      // Auto login after register
-      const {error:loginErr} = await sb.auth.signInWithPassword({email, password});
-      if(loginErr) {
-        setAuthError('Daftar berhasil! Silakan masuk.');
-        switchTab('login');
+      // signUp sudah auto login jika confirm email off
+      if(data.session){
+        currentUser = data.session.user;
+        document.getElementById('auth-screen').classList.remove('active');
+        showLoading(true);
+        await enterApp();
+      } else {
+        // Fallback: manual login
+        const {data:d2, error:e2} = await sb.auth.signInWithPassword({email, password});
+        if(e2) { setAuthError('Daftar berhasil, silakan login'); switchTab('login'); return; }
+        currentUser = d2.user;
+        document.getElementById('auth-screen').classList.remove('active');
+        showLoading(true);
+        await enterApp();
       }
     } else {
-      const {error} = await sb.auth.signInWithPassword({email, password});
+      const {data, error} = await sb.auth.signInWithPassword({email, password});
       if(error) throw error;
+      currentUser = data.user;
+      document.getElementById('auth-screen').classList.remove('active');
+      showLoading(true);
+      await enterApp();
     }
   } catch(e){
     const msg = e.message || 'Terjadi kesalahan';
-    if(msg.includes('Invalid login')) setAuthError('Email atau password salah');
+    if(msg.includes('Invalid login credentials')) setAuthError('Email atau password salah');
     else if(msg.includes('already registered')) setAuthError('Email sudah terdaftar, silakan masuk');
-    else if(msg.includes('Email not confirmed')) setAuthError('Email belum dikonfirmasi');
+    else if(msg.includes('Email not confirmed')) setAuthError('Email belum dikonfirmasi — hubungi admin');
+    else if(msg.includes('User already registered')) { setAuthError('Email sudah terdaftar'); switchTab('login'); }
     else setAuthError(msg);
   } finally {
     setAuthLoading(false);
