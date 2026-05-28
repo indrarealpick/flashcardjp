@@ -439,20 +439,47 @@ let pendingRequests={},toastTimer=null,selectedPaletteIdx=0;
 //  INIT
 // ═══════════════════════════════════════
 async function init(){
-  showLoading(true);
   buildColorPicker();
+  document.addEventListener('keydown',handleKeydown);
 
   // API key
   const k=localStorage.getItem(API_KEY_STORE)||'';
   if(k){document.getElementById('api-key-input').value=k;updateApiBtn(k)}
-  document.addEventListener('keydown',handleKeydown);
 
-  // Listen auth changes FIRST before getSession
-  sb.auth.onAuthStateChange(async (event, session) => {
-    if(event === 'SIGNED_IN' && session && !currentUser){
+  // Safety timeout — if loading stuck, show auth screen
+  const loadTimeout = setTimeout(()=>{
+    showLoading(false);
+    document.getElementById('auth-screen').classList.add('active');
+  }, 5000);
+
+  try {
+    // Check existing session
+    const {data:{session}, error} = await sb.auth.getSession();
+    clearTimeout(loadTimeout);
+
+    if(session && session.user){
       currentUser = session.user;
-      document.getElementById('auth-screen').classList.remove('active');
+      showLoading(true);
       await enterApp();
+    } else {
+      showLoading(false);
+      document.getElementById('auth-screen').classList.add('active');
+    }
+  } catch(e) {
+    clearTimeout(loadTimeout);
+    showLoading(false);
+    document.getElementById('auth-screen').classList.add('active');
+  }
+
+  // Listen for auth state changes
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if(event === 'SIGNED_IN' && session){
+      if(!currentUser || currentUser.id !== session.user.id){
+        currentUser = session.user;
+        document.getElementById('auth-screen').classList.remove('active');
+        showLoading(true);
+        await enterApp();
+      }
     }
     if(event === 'TOKEN_REFRESHED' && session){
       currentUser = session.user;
@@ -466,16 +493,6 @@ async function init(){
       resetAuthForm();
     }
   });
-
-  // Check existing session
-  const {data:{session}} = await sb.auth.getSession();
-  if(session && session.user){
-    currentUser = session.user;
-    await enterApp();
-  } else {
-    showLoading(false);
-    document.getElementById('auth-screen').classList.add('active');
-  }
 }
 
 async function enterApp(){
@@ -499,6 +516,18 @@ async function enterApp(){
 function showLoading(show){
   const el=document.getElementById('loading-screen');
   el.style.display=show?'flex':'none';
+  // Safety: auto-hide after 8 seconds
+  if(show){
+    clearTimeout(window._loadTimer);
+    window._loadTimer=setTimeout(()=>{
+      el.style.display='none';
+      if(!currentUser){
+        document.getElementById('auth-screen').classList.add('active');
+      }
+    },8000);
+  } else {
+    clearTimeout(window._loadTimer);
+  }
 }
 
 // ═══════════════════════════════════════
