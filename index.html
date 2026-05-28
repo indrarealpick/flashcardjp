@@ -66,7 +66,7 @@ select option{background:#0D1526;color:#FFF8EE}
 .field-label{display:block;font-size:0.62rem;color:rgba(255,248,238,0.38);letter-spacing:1.8px;margin-bottom:6px;text-transform:uppercase;font-weight:600}
 .field-input{width:100%;background:#131F38;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#FFF8EE;padding:11px 13px;font-size:0.9rem;outline:none;transition:border-color 0.15s,box-shadow 0.15s}
 .field-input:focus{border-color:#E8B15D;box-shadow:0 0 0 3px rgba(232,177,93,0.08)}
-.field-input.jp{font-family:'Noto Sans JP',sans-serif;font-size:1.5rem;letter-spacing:2px;font-weight:700;padding:13px 15px}
+.field-input.jp{font-family:'Noto Sans JP',sans-serif;font-size:1.5rem;letter-spacing:0;font-weight:700;padding:13px 15px}
 .field-input.hi{font-family:'Noto Serif JP',serif;letter-spacing:1px}
 .field-select{width:100%;background:#131F38;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#FFF8EE;padding:11px 13px;font-size:0.9rem;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='rgba(255,248,238,0.35)' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;transition:border-color 0.15s}
 .field-select:focus{border-color:#E8B15D}
@@ -211,11 +211,11 @@ select option{background:#0D1526;color:#FFF8EE}
       <div class="flip-inner" id="flip-inner">
         <div class="flip-face flip-front" style="overflow:hidden">
           <span style="position:absolute;font-family:'Noto Serif JP',serif;font-size:10rem;color:rgba(255,248,238,0.032);font-weight:700;user-select:none;pointer-events:none;top:58%;left:50%;transform:translate(-50%,-50%);filter:blur(1px)">語</span>
-          <span id="study-jp" style="font-family:'Noto Sans JP',sans-serif;font-size:clamp(2.2rem,9vw,3.8rem);color:#FFF8EE;font-weight:700;letter-spacing:3px;line-height:1.15;text-align:center;padding:0 1.25rem;text-shadow:0 1px 6px rgba(0,0,0,0.4)"></span>
+          <span id="study-jp" style="font-family:'Noto Sans JP',sans-serif;font-size:clamp(2.4rem,10vw,4rem);color:#FFF8EE;font-weight:700;letter-spacing:0;line-height:1.2;text-align:center;padding:0 1.5rem;text-shadow:0 1px 6px rgba(0,0,0,0.35)"></span>
           <span style="font-size:0.68rem;color:rgba(255,255,255,0.42);letter-spacing:2.5px;margin-top:8px">タップして答えを見る</span>
         </div>
         <div class="flip-face flip-back">
-          <span id="study-hira" style="font-family:'Noto Sans JP',sans-serif;font-size:1rem;color:rgba(180,235,180,0.9);letter-spacing:2px;font-weight:500"></span>
+          <span id="study-hira" style="font-family:'Noto Sans JP',sans-serif;font-size:1rem;color:rgba(180,235,180,0.9);letter-spacing:0.5px;font-weight:500"></span>
           <span id="study-roma" style="font-size:0.82rem;color:rgba(180,235,180,0.65);letter-spacing:1.5px;font-style:italic"></span>
           <div style="width:28px;height:1px;background:rgba(255,255,255,0.1);margin:5px 0"></div>
           <span id="study-mean" style="font-size:clamp(1.3rem,5vw,2rem);color:#FFF8EE;font-weight:700;text-align:center;padding:0 1.5rem;line-height:1.25;letter-spacing:0.3px"></span>
@@ -823,7 +823,7 @@ function renderCategoryView(){
     <div class="card-item">
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px">
-          <span style="font-family:'Noto Sans JP',sans-serif;font-size:1.5rem;color:#FFF8EE;font-weight:700;line-height:1.2;letter-spacing:0.5px">${esc(card.japanese)}</span>
+          <span style="font-family:'Noto Sans JP',sans-serif;font-size:1.5rem;color:#FFF8EE;font-weight:700;line-height:1.2;letter-spacing:0">${esc(card.japanese)}</span>
           ${card.aiDetected?'<span style="font-size:0.58rem;color:#86efac;background:rgba(134,239,172,0.09);border:1px solid rgba(134,239,172,0.2);border-radius:5px;padding:2px 7px;font-weight:700;letter-spacing:1px">AI</span>':''}
         </div>
         <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:3px">
