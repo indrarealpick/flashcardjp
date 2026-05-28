@@ -49,7 +49,7 @@ select option{background:#0D1526;color:#FFF8EE}
 .prog-fill{height:100%;border-radius:2px;transition:width 0.4s ease;background:#E8B15D}
 
 /* ── Flip card ── */
-.flip-wrap{perspective:1200px;width:100%;max-width:400px;height:248px;margin:0 auto;cursor:pointer;user-select:none;transition:transform 0.2s ease}
+.flip-wrap{perspective:1200px;width:100%;max-width:440px;height:290px;margin:0 auto;cursor:pointer;user-select:none;transition:transform 0.2s ease}
 .flip-wrap:hover{transform:translateY(-2px)}
 .flip-inner{transform-style:preserve-3d;transition:transform 0.5s cubic-bezier(0.42,0.14,0.14,1);width:100%;height:100%;position:relative}
 .flip-inner.flipped{transform:rotateY(180deg)}
@@ -118,7 +118,7 @@ select option{background:#0D1526;color:#FFF8EE}
 .user-avatar{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#E8B15D,#DDA64C);display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;color:#0D0F18}
 
 @media(max-width:480px){
-  .flip-wrap{height:218px}
+  .flip-wrap{height:260px}
   .cat-card,.card-item{padding:13px 14px}
 }
 </style>
@@ -195,7 +195,7 @@ select option{background:#0D1526;color:#FFF8EE}
 
 <!-- ══ STUDY OVERLAY ══ -->
 <div id="study-overlay">
-  <div style="width:100%;max-width:500px;display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem 0.875rem">
+  <div style="width:100%;max-width:500px;display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem 0.5rem">
     <button onclick="closeStudy()" style="font-size:0.76rem;color:rgba(255,248,238,0.5);background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:100px;padding:7px 15px;cursor:pointer;font-weight:500">← Keluar</button>
     <div style="text-align:center">
       <div id="study-cat-label" style="font-size:0.58rem;color:rgba(255,248,238,0.28);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px;font-weight:600"></div>
@@ -203,15 +203,15 @@ select option{background:#0D1526;color:#FFF8EE}
     </div>
     <button id="shuffle-btn" onclick="toggleShuffle()" style="font-size:0.76rem;color:rgba(255,248,238,0.38);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:100px;padding:7px 15px;cursor:pointer;font-weight:500">⇄ Acak</button>
   </div>
-  <div style="width:100%;max-width:500px;padding:0 1.25rem;margin-bottom:2.25rem">
+  <div style="width:100%;max-width:500px;padding:0 1.25rem;margin-bottom:1.5rem">
     <div class="prog-track"><div id="study-prog" class="prog-fill" style="width:0%"></div></div>
   </div>
   <div style="width:100%;padding:0 1.25rem;max-width:500px">
     <div class="flip-wrap" onclick="flipCard()">
       <div class="flip-inner" id="flip-inner">
         <div class="flip-face flip-front" style="overflow:hidden">
-          <span style="position:absolute;font-family:'Noto Serif JP',serif;font-size:10rem;color:rgba(255,248,238,0.032);font-weight:700;user-select:none;pointer-events:none;top:58%;left:50%;transform:translate(-50%,-50%);filter:blur(1px)">語</span>
-          <span id="study-jp" style="font-family:'Noto Sans JP',sans-serif;font-size:clamp(2.4rem,10vw,4rem);color:#FFF8EE;font-weight:700;letter-spacing:0;line-height:1.2;text-align:center;padding:0 1.5rem;text-shadow:0 1px 6px rgba(0,0,0,0.35)"></span>
+          
+          <span id="study-jp" style="font-family:'Noto Sans JP',sans-serif;font-size:clamp(2.8rem,11vw,4.6rem);color:#FFF8EE;font-weight:700;letter-spacing:0;line-height:1.15;text-align:center;padding:0 1.25rem;text-shadow:0 2px 8px rgba(0,0,0,0.3)"></span>
           <span style="font-size:0.68rem;color:rgba(255,255,255,0.42);letter-spacing:2.5px;margin-top:8px">タップして答えを見る</span>
         </div>
         <div class="flip-face flip-back">
