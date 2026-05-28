@@ -1,0 +1,34 @@
+{
+  "name": "Flashcard 日本語",
+  "short_name": "Flashcard JP",
+  "description": "Aplikasi flashcard belajar bahasa Jepang",
+  "start_url": "/flashcardjp/",
+  "scope": "/flashcardjp/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#06091C",
+  "theme_color": "#06091C",
+  "lang": "id",
+  "icons": [
+    {
+      "src": "android_launcher_192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "android_playstore_512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "ios_appstore_1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["education", "utilities"],
+  "screenshots": []
+}
