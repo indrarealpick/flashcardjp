@@ -7,37 +7,45 @@
 <link rel="icon" type="image/png" href="https://indrarealpick.github.io/flashcardjp/android_playstore_512.png"/>
 <link rel="apple-touch-icon" href="https://indrarealpick.github.io/flashcardjp/android_playstore_512.png"/>
 <link rel="manifest" href="manifest.json"/>
-<meta name="theme-color" content="#06091C"/>
+<meta name="theme-color" content="#FFF9F0"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Flashcard JP"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Serif+JP:wght@400;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Space+Grotesk:wght@400;500;600;700;800&display=swap');
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{background:#06091C;min-height:100vh;font-family:'Noto Sans JP','Zen Kaku Gothic New',sans-serif;color:#FFF8EE;-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:3px}
-::-webkit-scrollbar-thumb{background:rgba(232,177,93,0.2);border-radius:3px}
+html,body{
+  background:#FFF9F0;
+  min-height:100vh;
+  font-family:'Space Grotesk','Noto Sans JP',sans-serif;
+  color:#0D0D0D;
+  -webkit-font-smoothing:antialiased;
+}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:#0D0D0D;border-radius:0}
 input,button,select{font-family:inherit;-webkit-tap-highlight-color:transparent}
-input::placeholder{color:rgba(255,248,238,0.2)}
-button{cursor:pointer;transition:transform 0.12s ease,opacity 0.12s ease,box-shadow 0.15s ease}
-button:active{opacity:0.82;transform:scale(0.96)!important}
-select option{background:#0D1526;color:#FFF8EE}
+input::placeholder{color:rgba(13,13,13,0.35)}
+button{cursor:pointer}
+button:active{transform:translate(2px,2px)!important}
+select option{background:#FFF9F0;color:#0D0D0D}
 
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
 
+/* ── Layout ── */
 #root{position:relative;z-index:1}
 .container{max-width:660px;margin:0 auto;padding:0 1rem 5rem}
 
 /* ── Auth screen ── */
 #auth-screen{
   display:none;position:fixed;inset:0;z-index:80;
-  background:#06091C;
+  background:#FFF9F0;
   flex-direction:column;align-items:center;justify-content:center;
   padding:2rem;
 }
@@ -47,81 +55,239 @@ select option{background:#0D1526;color:#FFF8EE}
 #study-overlay{
   display:none;position:fixed;inset:0;z-index:50;
   flex-direction:column;align-items:center;justify-content:center;
-  background:#06091C;
+  background:#FFF9F0;
 }
 #study-overlay.active{display:flex}
 
-.prog-track{height:2px;border-radius:2px;background:rgba(255,255,255,0.08);overflow:hidden}
-.prog-fill{height:100%;border-radius:2px;transition:width 0.4s ease;background:#E8B15D}
+/* ── Progress ── */
+.prog-track{height:6px;border-radius:0;background:#E0D5C5;overflow:hidden;border:2px solid #0D0D0D}
+.prog-fill{height:100%;border-radius:0;transition:width 0.4s ease;background:#E8B15D}
 
 /* ── Flip card ── */
-.flip-wrap{perspective:1200px;width:100%;max-width:440px;height:290px;margin:0 auto;cursor:pointer;user-select:none;transition:transform 0.2s ease}
-.flip-wrap:hover{transform:translateY(-2px)}
+.flip-wrap{perspective:1200px;width:100%;max-width:440px;height:290px;margin:0 auto;cursor:pointer;user-select:none;transition:transform 0.15s ease}
+.flip-wrap:hover{transform:translate(-2px,-2px)}
 .flip-inner{transform-style:preserve-3d;transition:transform 0.5s cubic-bezier(0.42,0.14,0.14,1);width:100%;height:100%;position:relative}
 .flip-inner.flipped{transform:rotateY(180deg)}
-.flip-face{backface-visibility:hidden;-webkit-backface-visibility:hidden;position:absolute;inset:0;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
-.flip-front{background:linear-gradient(180deg,rgba(26,36,72,0.98) 0%,rgba(16,22,48,0.99) 100%);border:1px solid rgba(255,255,255,0.14);box-shadow:0 12px 44px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.08)}
-.flip-back{background:linear-gradient(180deg,rgba(16,30,20,0.98) 0%,rgba(8,16,11,0.99) 100%);border:1px solid rgba(255,255,255,0.09);transform:rotateY(180deg);box-shadow:0 12px 44px rgba(0,0,0,0.5),0 0 24px rgba(110,231,120,0.05),inset 0 1px 0 rgba(255,255,255,0.06),inset 0 -1px 0 rgba(0,0,0,0.2)}
+.flip-face{
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  position:absolute;inset:0;border-radius:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+}
+.flip-front{
+  background:#FFFDF7;
+  border:3px solid #0D0D0D;
+  box-shadow:6px 6px 0 #0D0D0D;
+}
+.flip-back{
+  background:#E8F5E1;
+  border:3px solid #0D0D0D;
+  box-shadow:6px 6px 0 #0D0D0D;
+  transform:rotateY(180deg);
+}
 
 /* ── Modal ── */
-.modal-overlay{display:none;position:fixed;inset:0;z-index:60;align-items:center;justify-content:center;background:rgba(4,7,20,0.88);padding:1rem;overflow-y:auto}
+.modal-overlay{display:none;position:fixed;inset:0;z-index:60;align-items:center;justify-content:center;background:rgba(13,13,13,0.6);padding:1rem;overflow-y:auto}
 .modal-overlay.open{display:flex}
-.modal-box{background:linear-gradient(180deg,#141E3A,#0E1528);border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:1.5rem;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.8),0 0 0 1px rgba(255,255,255,0.03);margin:auto;animation:fadeUp 0.2s ease}
+.modal-box{
+  background:#FFF9F0;
+  border:3px solid #0D0D0D;
+  box-shadow:8px 8px 0 #0D0D0D;
+  border-radius:0;
+  padding:1.5rem;
+  width:100%;max-width:420px;
+  margin:auto;
+  animation:fadeUp 0.2s ease;
+}
 
 /* ── Form ── */
-.field-label{display:block;font-size:0.62rem;color:rgba(255,248,238,0.38);letter-spacing:1.8px;margin-bottom:6px;text-transform:uppercase;font-weight:600}
-.field-input{width:100%;background:#131F38;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#FFF8EE;padding:11px 13px;font-size:0.9rem;outline:none;transition:border-color 0.15s,box-shadow 0.15s}
-.field-input:focus{border-color:#E8B15D;box-shadow:0 0 0 3px rgba(232,177,93,0.08)}
+.field-label{display:block;font-size:0.65rem;color:#0D0D0D;letter-spacing:2px;margin-bottom:6px;text-transform:uppercase;font-weight:700}
+.field-input{
+  width:100%;
+  background:#FFFDF7;
+  border:2.5px solid #0D0D0D;
+  border-radius:0;
+  color:#0D0D0D;
+  padding:11px 13px;
+  font-size:0.92rem;
+  outline:none;
+  transition:box-shadow 0.15s;
+  font-weight:500;
+}
+.field-input:focus{box-shadow:4px 4px 0 #0D0D0D;border-color:#0D0D0D}
 .field-input.jp{font-family:'Noto Sans JP',sans-serif;font-size:1.5rem;letter-spacing:0;font-weight:700;padding:13px 15px}
-.field-input.hi{font-family:'Noto Serif JP',serif;letter-spacing:1px}
-.field-select{width:100%;background:#131F38;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#FFF8EE;padding:11px 13px;font-size:0.9rem;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='rgba(255,248,238,0.35)' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;transition:border-color 0.15s}
-.field-select:focus{border-color:#E8B15D}
+.field-input.hi{font-family:'Noto Sans JP',sans-serif;letter-spacing:0.5px}
+.field-select{
+  width:100%;
+  background:#FFFDF7;
+  border:2.5px solid #0D0D0D;
+  border-radius:0;
+  color:#0D0D0D;
+  padding:11px 13px;
+  font-size:0.92rem;
+  outline:none;
+  cursor:pointer;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%230D0D0D' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 13px center;
+  font-weight:500;
+}
+.field-select:focus{box-shadow:4px 4px 0 #0D0D0D}
 
 /* ── Buttons ── */
-.btn-gold{background:linear-gradient(180deg,#F0C06A,#DDA64C);color:#0D0F18;border:none;font-weight:700;border-radius:10px;padding:12px 20px;font-size:0.88rem;cursor:pointer;transition:filter 0.15s,transform 0.12s,box-shadow 0.15s;box-shadow:0 4px 14px rgba(232,177,93,0.28),inset 0 1px 0 rgba(255,255,255,0.18);letter-spacing:0.2px}
-.btn-gold:hover{filter:brightness(1.06);box-shadow:0 6px 20px rgba(232,177,93,0.38),inset 0 1px 0 rgba(255,255,255,0.18);transform:translateY(-1px)}
-.btn-gold:active{transform:translateY(0)!important;filter:brightness(0.96)}
-.btn-ghost{background:rgba(255,255,255,0.055);border:1px solid rgba(255,255,255,0.1);color:rgba(255,248,238,0.58);border-radius:10px;padding:12px 18px;font-size:0.88rem;cursor:pointer;transition:background 0.18s,color 0.18s,border-color 0.18s,transform 0.12s}
-.btn-ghost:hover{background:rgba(255,255,255,0.1);color:#FFF8EE;border-color:rgba(255,255,255,0.18);transform:translateY(-1px)}
-.btn-ghost:active{transform:translateY(0)!important}
+.btn-gold{
+  background:#E8B15D;
+  color:#0D0D0D;
+  border:2.5px solid #0D0D0D;
+  box-shadow:4px 4px 0 #0D0D0D;
+  font-weight:900;
+  border-radius:0;
+  padding:12px 20px;
+  font-size:0.9rem;
+  cursor:pointer;
+  transition:box-shadow 0.1s,transform 0.1s;
+  letter-spacing:0.5px;
+}
+.btn-gold:hover{box-shadow:6px 6px 0 #0D0D0D;transform:translate(-1px,-1px)}
+.btn-gold:active{box-shadow:2px 2px 0 #0D0D0D;transform:translate(2px,2px)!important}
+.btn-green{
+  background:#4CAF50;
+  color:#FFFFFF;
+  border:2.5px solid #0D0D0D;
+  box-shadow:4px 4px 0 #0D0D0D;
+  font-weight:900;
+  border-radius:0;
+  padding:12px 20px;
+  font-size:0.9rem;
+  cursor:pointer;
+  transition:box-shadow 0.1s,transform 0.1s;
+  letter-spacing:0.5px;
+}
+.btn-green:hover{box-shadow:6px 6px 0 #0D0D0D;transform:translate(-1px,-1px)}
+.btn-green:active{box-shadow:2px 2px 0 #0D0D0D;transform:translate(2px,2px)!important}
+.btn-red{
+  background:#FF4D4D;
+  color:#FFFFFF;
+  border:2.5px solid #0D0D0D;
+  box-shadow:4px 4px 0 #0D0D0D;
+  font-weight:900;
+  border-radius:0;
+  padding:12px 20px;
+  font-size:0.9rem;
+  cursor:pointer;
+  transition:box-shadow 0.1s,transform 0.1s;
+  letter-spacing:0.5px;
+}
+.btn-red:hover{box-shadow:6px 6px 0 #0D0D0D;transform:translate(-1px,-1px)}
+.btn-red:active{box-shadow:2px 2px 0 #0D0D0D;transform:translate(2px,2px)!important}
+
+.btn-ghost{
+  background:#FFFDF7;
+  border:2.5px solid #0D0D0D;
+  box-shadow:4px 4px 0 #0D0D0D;
+  color:#0D0D0D;
+  border-radius:0;
+  padding:12px 18px;
+  font-size:0.88rem;
+  cursor:pointer;
+  font-weight:800;
+  letter-spacing:0.3px;
+  transition:box-shadow 0.1s,transform 0.1s;
+}
+.btn-ghost:hover{box-shadow:6px 6px 0 #0D0D0D;transform:translate(-1px,-1px)}
+.btn-ghost:active{box-shadow:2px 2px 0 #0D0D0D;transform:translate(2px,2px)!important}
 
 /* ── Toast ── */
-#toast{display:none;position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);padding:10px 22px;border-radius:11px;font-size:0.82rem;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,0.6);white-space:nowrap;z-index:99;pointer-events:none}
+#toast{display:none;position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);padding:10px 22px;border-radius:0;font-size:0.82rem;font-weight:700;white-space:nowrap;z-index:99;pointer-events:none;border:2.5px solid #0D0D0D}
 #toast.show{display:block;animation:toastIn 0.25s ease forwards}
-#toast.ok{background:#0D1526;border:1px solid rgba(232,177,93,0.3);color:#E8B15D}
-#toast.err{background:#1a0a0a;border:1px solid rgba(248,113,113,0.3);color:#fca5a5}
-#toast.info{background:#0D1526;border:1px solid rgba(126,181,232,0.3);color:#7eb5e8}
+#toast.ok{background:#E8B15D;color:#0D0D0D;box-shadow:4px 4px 0 #0D0D0D}
+#toast.err{background:#FF6B6B;color:#fff;box-shadow:4px 4px 0 #0D0D0D}
+#toast.info{background:#7eb5e8;color:#0D0D0D;box-shadow:4px 4px 0 #0D0D0D}
 
 /* ── Card list ── */
-.card-item{animation:fadeUp 0.18s ease forwards;background:linear-gradient(180deg,rgba(20,28,52,0.96),rgba(12,16,36,0.98));border:1px solid rgba(255,255,255,0.09);border-radius:14px;padding:15px 16px;display:flex;align-items:center;gap:13px;margin-bottom:8px;transition:border-color 0.18s,box-shadow 0.18s,transform 0.18s;box-shadow:0 4px 18px rgba(0,0,0,0.35)}
-.card-item:hover{border-color:rgba(232,177,93,0.22);box-shadow:0 6px 24px rgba(0,0,0,0.45),0 0 0 1px rgba(232,177,93,0.04);transform:translateY(-1px)}
+.card-item{
+  animation:fadeUp 0.18s ease forwards;
+  background:#FFFDF7;
+  border:2.5px solid #0D0D0D;
+  box-shadow:4px 4px 0 #0D0D0D;
+  border-radius:0;
+  padding:15px 16px;
+  display:flex;align-items:center;gap:13px;
+  margin-bottom:10px;
+  transition:box-shadow 0.1s,transform 0.1s;
+}
+.card-item:hover{box-shadow:6px 6px 0 #0D0D0D;transform:translate(-1px,-1px)}
 .card-item .card-actions button{opacity:0;transition:opacity 0.12s}
 .card-item:hover .card-actions button{opacity:1!important}
 
 /* ── Category card ── */
-.cat-card{background:linear-gradient(180deg,rgba(20,28,52,0.96),rgba(12,16,36,0.98));border:1px solid rgba(255,255,255,0.09);border-radius:14px;padding:16px;cursor:pointer;display:flex;align-items:center;gap:13px;margin-bottom:9px;transition:border-color 0.15s,box-shadow 0.15s,transform 0.15s;box-shadow:0 4px 18px rgba(0,0,0,0.3)}
-.cat-card:hover{border-color:rgba(232,177,93,0.22);background:rgba(24,34,64,0.98);transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,0,0,0.45)}
+.cat-card{
+  background:#FFFDF7;
+  border:2.5px solid #0D0D0D;
+  box-shadow:4px 4px 0 #0D0D0D;
+  border-radius:0;
+  padding:16px;
+  cursor:pointer;
+  display:flex;align-items:center;gap:13px;
+  margin-bottom:10px;
+  transition:box-shadow 0.1s,transform 0.1s;
+}
+.cat-card:hover{box-shadow:6px 6px 0 #0D0D0D;transform:translate(-1px,-1px)}
+.cat-card:active{box-shadow:2px 2px 0 #0D0D0D;transform:translate(2px,2px)}
 
 /* ── Breadcrumb ── */
-.breadcrumb-btn{display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;color:rgba(255,248,238,0.4);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:100px;padding:7px 16px;cursor:pointer;transition:all 0.18s;margin-bottom:20px;font-weight:500;letter-spacing:0.2px}
-.breadcrumb-btn:hover{color:#E8B15D;border-color:rgba(232,177,93,0.25);background:rgba(232,177,93,0.05);transform:translateX(-1px)}
+.breadcrumb-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:0.8rem;color:#0D0D0D;
+  background:#FFFDF7;
+  border:2.5px solid #0D0D0D;
+  box-shadow:3px 3px 0 #0D0D0D;
+  border-radius:0;
+  padding:7px 14px;cursor:pointer;
+  transition:box-shadow 0.1s,transform 0.1s;
+  margin-bottom:20px;font-weight:700;
+}
+.breadcrumb-btn:hover{box-shadow:5px 5px 0 #0D0D0D;transform:translate(-1px,-1px)}
+.breadcrumb-btn:active{box-shadow:1px 1px 0 #0D0D0D;transform:translate(2px,2px)}
 
 /* ── Search ── */
 .search-wrap{position:relative;margin-bottom:14px}
-.search-wrap::before{content:'🔍';font-size:0.72rem;position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;opacity:0.35}
-.search-input{width:100%;background:#0F1830;border:1px solid rgba(255,255,255,0.09);border-radius:11px;color:#FFF8EE;padding:10px 14px 10px 36px;font-size:0.88rem;outline:none;transition:border-color 0.15s}
-.search-input:focus{border-color:rgba(232,177,93,0.4)}
+.search-wrap::before{content:'🔍';font-size:0.72rem;position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;opacity:0.6}
+.search-input{
+  width:100%;
+  background:#FFFDF7;
+  border:2.5px solid #0D0D0D;
+  border-radius:0;
+  color:#0D0D0D;
+  padding:10px 14px 10px 36px;
+  font-size:0.88rem;
+  outline:none;
+  font-weight:500;
+  transition:box-shadow 0.15s;
+}
+.search-input:focus{box-shadow:4px 4px 0 #0D0D0D}
 
 /* ── Color picker ── */
-.cp-btn{width:34px;height:34px;border-radius:9px;font-size:0.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.12s;border:2px solid transparent}
-.cp-btn:hover{transform:scale(1.1)}
+.cp-btn{width:36px;height:36px;border-radius:0;font-size:0.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.1s;border:2.5px solid transparent}
+.cp-btn:hover{transform:translate(-1px,-1px)}
 
 /* ── Loading spinner ── */
-.spinner{width:32px;height:32px;border:2px solid rgba(232,177,93,0.15);border-top-color:#E8B15D;border-radius:50%;animation:spin 0.7s linear infinite}
+.spinner{width:32px;height:32px;border:3px solid rgba(13,13,13,0.15);border-top-color:#E8B15D;border-radius:50%;animation:spin 0.7s linear infinite}
 
 /* ── User avatar ── */
-.user-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:100px;padding:5px 12px 5px 6px;font-size:0.75rem;color:rgba(255,248,238,0.55)}
-.user-avatar{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#E8B15D,#DDA64C);display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;color:#0D0F18}
+.user-pill{display:inline-flex;align-items:center;gap:7px;background:#FFFDF7;border:2.5px solid #0D0D0D;box-shadow:3px 3px 0 #0D0D0D;border-radius:0;padding:5px 12px 5px 6px;font-size:0.75rem;color:#0D0D0D;font-weight:600}
+.user-avatar{width:24px;height:24px;border-radius:0;background:#E8B15D;border:2px solid #0D0D0D;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:800;color:#0D0D0D}
+
+/* ── Decorative stripes ── */
+.stripe-bg{
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 4px,
+    rgba(13,13,13,0.04) 4px,
+    rgba(13,13,13,0.04) 8px
+  );
+}
 
 @media(max-width:480px){
   .flip-wrap{height:260px}
@@ -135,17 +301,17 @@ select option{background:#0D1526;color:#FFF8EE}
 <div id="auth-screen" class="active">
   <div style="text-align:center;margin-bottom:2rem">
     <img src="https://indrarealpick.github.io/flashcardjp/android_playstore_512.png" alt="Flashcard Jepang"
-      style="width:88px;height:88px;border-radius:22px;margin-bottom:16px;box-shadow:0 8px 28px rgba(0,0,0,0.45);display:block;margin-left:auto;margin-right:auto"
+      style="width:88px;height:88px;border:3px solid #0D0D0D;box-shadow:5px 5px 0 #0D0D0D;display:block;margin:0 auto 16px;border-radius:0"
       onerror="this.style.display='none'"/>
-    <h1 style="font-family:'Noto Serif JP',serif;font-size:clamp(1.6rem,5.5vw,2.4rem);color:#FFF8EE;font-weight:700;line-height:1.2">Flashcard 日本語</h1>
-    <p style="color:rgba(255,248,238,0.28);font-size:0.78rem;margin-top:8px">Masuk atau daftar untuk mulai belajar</p>
+    <h1 style="font-family:'Space Grotesk','Noto Sans JP',sans-serif;font-size:clamp(1.6rem,5.5vw,2.4rem);color:#0D0D0D;font-weight:800;line-height:1.2">Flashcard 日本語</h1>
+    <p style="color:rgba(13,13,13,0.5);font-size:0.78rem;margin-top:8px;font-weight:500">Masuk atau daftar untuk mulai belajar</p>
   </div>
 
   <div style="width:100%;max-width:360px">
-    <div style="background:linear-gradient(180deg,#141E3A,#0E1528);border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:1.5rem">
+    <div style="background:#FFFDF7;border:3px solid #0D0D0D;box-shadow:7px 7px 0 #0D0D0D;border-radius:0;padding:1.5rem">
 
       <!-- Tab toggle -->
-      <div style="display:flex;background:rgba(255,255,255,0.05);border-radius:10px;padding:3px;margin-bottom:22px">
+      <div style="display:flex;background:#D4C5B0;border:2.5px solid #0D0D0D;padding:4px;gap:4px;margin-bottom:22px">
         <button id="tab-login" onclick="switchTab('login')"
           style="flex:1;padding:8px;border-radius:8px;border:none;font-size:0.8rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;transition:all 0.18s;background:linear-gradient(180deg,#F0C06A,#DDA64C);color:#0D0F18;box-shadow:0 2px 8px rgba(232,177,93,0.25)">
           Masuk
@@ -188,10 +354,10 @@ select option{background:#0D1526;color:#FFF8EE}
       </div>
 
       <!-- Error message -->
-      <p id="auth-error" style="display:none;font-size:0.72rem;color:#fca5a5;margin-top:8px;margin-bottom:4px;line-height:1.5;text-align:center"></p>
+      <p id="auth-error" style="display:none;font-size:0.72rem;color:#CC3333;margin-top:8px;margin-bottom:4px;line-height:1.5;text-align:center;font-weight:700"></p>
 
       <!-- Submit button -->
-      <button id="auth-submit-btn" onclick="submitAuth()" class="btn-gold"
+      <button id="auth-submit-btn" onclick="submitAuth()" class="btn-red"
         style="width:100%;border-radius:10px;padding:13px;font-size:0.9rem;margin-top:16px">
         Masuk
       </button>
@@ -202,12 +368,12 @@ select option{background:#0D1526;color:#FFF8EE}
 <!-- ══ STUDY OVERLAY ══ -->
 <div id="study-overlay">
   <div style="width:100%;max-width:500px;display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem 0.5rem">
-    <button onclick="closeStudy()" style="font-size:0.76rem;color:rgba(255,248,238,0.5);background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:100px;padding:7px 15px;cursor:pointer;font-weight:500">← Keluar</button>
+    <button onclick="closeStudy()" style="font-size:0.76rem;color:#0D0D0D;background:#FFFDF7;border:2.5px solid #0D0D0D;box-shadow:3px 3px 0 #0D0D0D;border-radius:0;padding:7px 15px;cursor:pointer;font-weight:700">← Keluar</button>
     <div style="text-align:center">
-      <div id="study-cat-label" style="font-size:0.58rem;color:rgba(255,248,238,0.28);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px;font-weight:600"></div>
-      <span id="study-counter" style="font-size:0.8rem;color:rgba(255,248,238,0.42);letter-spacing:2px">1 / 0</span>
+      <div id="study-cat-label" style="font-size:0.58rem;color:rgba(13,13,13,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px;font-weight:700"></div>
+      <span id="study-counter" style="font-size:0.8rem;color:#0D0D0D;letter-spacing:2px;font-weight:700">1 / 0</span>
     </div>
-    <button id="shuffle-btn" onclick="toggleShuffle()" style="font-size:0.76rem;color:rgba(255,248,238,0.38);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:100px;padding:7px 15px;cursor:pointer;font-weight:500">⇄ Acak</button>
+    <button id="shuffle-btn" onclick="toggleShuffle()" style="font-size:0.76rem;color:#0D0D0D;background:#FFFDF7;border:2.5px solid #0D0D0D;box-shadow:3px 3px 0 #0D0D0D;border-radius:0;padding:7px 15px;cursor:pointer;font-weight:700">⇄ Acak</button>
   </div>
   <div style="width:100%;max-width:500px;padding:0 1.25rem;margin-bottom:1.5rem">
     <div class="prog-track"><div id="study-prog" class="prog-fill" style="width:0%"></div></div>
@@ -217,30 +383,30 @@ select option{background:#0D1526;color:#FFF8EE}
       <div class="flip-inner" id="flip-inner">
         <div class="flip-face flip-front" style="overflow:hidden">
           
-          <span id="study-jp" style="font-family:'Noto Sans JP',sans-serif;font-size:clamp(2.8rem,11vw,4.6rem);color:#FFF8EE;font-weight:700;letter-spacing:0;line-height:1.15;text-align:center;padding:0 1.25rem;text-shadow:0 2px 8px rgba(0,0,0,0.3)"></span>
-          <span style="font-size:0.68rem;color:rgba(255,255,255,0.42);letter-spacing:2.5px;margin-top:8px">タップして答えを見る</span>
+          <span id="study-jp" style="font-family:'Noto Sans JP',sans-serif;font-size:clamp(2.8rem,11vw,4.6rem);color:#0D0D0D;font-weight:900;letter-spacing:0;line-height:1.15;text-align:center;padding:0 1.25rem"></span>
+          <span style="font-size:0.68rem;color:rgba(13,13,13,0.45);letter-spacing:2.5px;margin-top:8px;font-weight:600">タップして答えを見る</span>
         </div>
         <div class="flip-face flip-back">
-          <span id="study-hira" style="font-family:'Noto Sans JP',sans-serif;font-size:1rem;color:rgba(180,235,180,0.9);letter-spacing:0.5px;font-weight:500"></span>
-          <span id="study-roma" style="font-size:0.82rem;color:rgba(180,235,180,0.65);letter-spacing:1.5px;font-style:italic"></span>
-          <div style="width:28px;height:1px;background:rgba(255,255,255,0.1);margin:5px 0"></div>
-          <span id="study-mean" style="font-size:clamp(1.3rem,5vw,2rem);color:#FFF8EE;font-weight:700;text-align:center;padding:0 1.5rem;line-height:1.25;letter-spacing:0.3px"></span>
+          <span id="study-hira" style="font-family:'Noto Sans JP',sans-serif;font-size:1rem;color:#2D6A4F;letter-spacing:0.5px;font-weight:700"></span>
+          <span id="study-roma" style="font-size:0.82rem;color:rgba(45,106,79,0.65);letter-spacing:1.5px;font-style:italic;font-weight:500"></span>
+          <div style="width:28px;height:2px;background:#0D0D0D;margin:6px 0"></div>
+          <span id="study-mean" style="font-size:clamp(1.3rem,5vw,2rem);color:#0D0D0D;font-weight:800;text-align:center;padding:0 1.5rem;line-height:1.25;letter-spacing:0.3px"></span>
         </div>
       </div>
     </div>
   </div>
-  <p style="margin-top:1.5rem;font-size:0.58rem;color:rgba(255,255,255,0.38);letter-spacing:2.5px;font-family:monospace;text-transform:uppercase">← → navigasi · space flip · esc keluar</p>
+  <p style="margin-top:1.5rem;font-size:0.58rem;color:rgba(13,13,13,0.4);letter-spacing:2.5px;font-family:monospace;text-transform:uppercase;font-weight:600">← → navigasi · space flip · esc keluar</p>
   <div style="display:flex;align-items:center;gap:12px;margin-top:1.4rem">
-    <button onclick="studyPrev()" style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,248,238,0.7);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center" onmouseover="this.style.transform='scale(1.06)';this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.transform='scale(1)';this.style.background='rgba(255,255,255,0.06)'">‹</button>
-    <button id="flip-btn" onclick="flipCard()" class="btn-gold" style="padding:11px 30px;border-radius:11px">Lihat Arti</button>
-    <button onclick="studyNext()" style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,248,238,0.7);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center" onmouseover="this.style.transform='scale(1.06)';this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.transform='scale(1)';this.style.background='rgba(255,255,255,0.06)'">›</button>
+    <button onclick="studyPrev()" style="width:48px;height:48px;border-radius:0;background:#FFFDF7;border:2.5px solid #0D0D0D;box-shadow:3px 3px 0 #0D0D0D;color:#0D0D0D;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:800;transition:all 0.1s">‹</button>
+    <button id="flip-btn" onclick="flipCard()" class="btn-red" style="padding:11px 30px;border-radius:0">Lihat Arti</button>
+    <button onclick="studyNext()" style="width:48px;height:48px;border-radius:0;background:#FFFDF7;border:2.5px solid #0D0D0D;box-shadow:3px 3px 0 #0D0D0D;color:#0D0D0D;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:800;transition:all 0.1s">›</button>
   </div>
 </div>
 
 <!-- ══ MODAL — Kategori ══ -->
 <div id="modal-cat" class="modal-overlay">
   <div class="modal-box">
-    <h3 id="modal-cat-title" style="font-size:0.68rem;color:#E8B15D;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:20px;font-weight:700">＋ Buat Kategori</h3>
+    <h3 id="modal-cat-title" style="font-size:0.68rem;color:#0D0D0D;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:20px;font-weight:800">＋ Buat Kategori</h3>
     <input type="hidden" id="modal-cat-id"/>
     <div style="margin-bottom:14px">
       <label class="field-label">Nama Kategori</label>
@@ -251,7 +417,7 @@ select option{background:#0D1526;color:#FFF8EE}
       <div id="color-picker" style="display:flex;flex-wrap:wrap;gap:7px;margin-top:5px"></div>
     </div>
     <div style="display:flex;gap:9px">
-      <button onclick="saveCategory()" class="btn-gold" style="flex:1;border-radius:10px">Simpan</button>
+      <button onclick="saveCategory()" class="btn-green" style="flex:1;border-radius:0">Simpan</button>
       <button onclick="closeCatModal()" class="btn-ghost">Batal</button>
     </div>
   </div>
@@ -260,7 +426,7 @@ select option{background:#0D1526;color:#FFF8EE}
 <!-- ══ MODAL — Flashcard ══ -->
 <div id="modal-card" class="modal-overlay">
   <div class="modal-box" style="max-width:440px">
-    <h3 id="modal-card-title" style="font-size:0.68rem;color:#E8B15D;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:20px;font-weight:700">＋ Tambah Flashcard</h3>
+    <h3 id="modal-card-title" style="font-size:0.68rem;color:#0D0D0D;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:20px;font-weight:800">＋ Tambah Flashcard</h3>
     <input type="hidden" id="cm-edit-id"/>
     <div style="margin-bottom:13px">
       <label class="field-label">Kategori</label>
@@ -291,7 +457,7 @@ select option{background:#0D1526;color:#FFF8EE}
       <input id="cm-meaning" class="field-input" placeholder="makan" oninput="manualFields.meaning=true"/>
     </div>
     <div style="display:flex;gap:9px">
-      <button onclick="saveCard()" class="btn-gold" style="flex:1;border-radius:10px">Simpan</button>
+      <button onclick="saveCard()" class="btn-green" style="flex:1;border-radius:0">Simpan</button>
       <button onclick="closeCardModal()" class="btn-ghost">Batal</button>
     </div>
   </div>
@@ -304,10 +470,10 @@ select option{background:#0D1526;color:#FFF8EE}
   <!-- Header -->
   <header style="padding-top:2rem;padding-bottom:1.5rem;text-align:center">
     <img src="https://indrarealpick.github.io/flashcardjp/android_playstore_512.png" alt="Flashcard Jepang"
-      style="width:64px;height:64px;border-radius:16px;margin-bottom:12px;box-shadow:0 6px 20px rgba(0,0,0,0.4);display:block;margin-left:auto;margin-right:auto"
+      style="width:64px;height:64px;border:3px solid #0D0D0D;box-shadow:4px 4px 0 #0D0D0D;display:block;margin:0 auto 12px;border-radius:0"
       onerror="this.style.display='none'"/>
-    <h1 style="font-family:'Noto Serif JP',serif;font-size:clamp(1.6rem,5.5vw,2.4rem);color:#FFF8EE;font-weight:700;line-height:1.2">Flashcard 日本語</h1>
-    <p id="global-count" style="color:rgba(255,248,238,0.28);font-size:0.76rem;margin-top:10px"></p>
+    <h1 style="font-family:'Space Grotesk','Noto Sans JP',sans-serif;font-size:clamp(1.6rem,5.5vw,2.4rem);color:#0D0D0D;font-weight:800;line-height:1.2">Flashcard 日本語</h1>
+    <p id="global-count" style="color:rgba(13,13,13,0.45);font-size:0.76rem;margin-top:10px;font-weight:500"></p>
   </header>
 
   <!-- User bar -->
@@ -316,7 +482,7 @@ select option{background:#0D1526;color:#FFF8EE}
       <div class="user-avatar" id="user-initial">?</div>
       <span id="user-email-display" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
     </div>
-    <button onclick="signOut()" style="font-size:0.68rem;color:rgba(255,248,238,0.32);background:none;border:1px solid rgba(255,255,255,0.07);border-radius:100px;padding:5px 12px;cursor:pointer;transition:all 0.15s" onmouseover="this.style.color='#fca5a5';this.style.borderColor='rgba(248,113,113,0.2)'" onmouseout="this.style.color='rgba(255,248,238,0.32)';this.style.borderColor='rgba(255,255,255,0.07)'">Keluar</button>
+    <button onclick="signOut()" style="font-size:0.68rem;color:#CC3333;background:#FFFDF7;border:2px solid #CC3333;box-shadow:2px 2px 0 #CC3333;border-radius:0;padding:5px 12px;cursor:pointer;font-weight:700;transition:all 0.1s">Keluar</button>
   </div>
 
 <!-- API key handled by Edge Function -->
@@ -324,18 +490,18 @@ select option{background:#0D1526;color:#FFF8EE}
   <!-- ── HOME VIEW ── -->
   <div id="view-home">
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;align-items:center">
-      <button onclick="openCategoryModal()" class="btn-gold" style="border-radius:10px;padding:10px 17px;font-size:0.84rem">＋ Kategori</button>
-      <button onclick="openCardModal(null)" class="btn-ghost" style="padding:10px 17px;font-size:0.84rem;font-weight:600">＋ Flashcard</button>
+      <button onclick="openCategoryModal()" class="btn-gold" style="border-radius:0;padding:10px 17px;font-size:0.84rem;font-weight:900">＋ Kategori</button>
+      <button onclick="openCardModal(null)" class="btn-red" style="padding:10px 17px;font-size:0.84rem;border-radius:0">＋ Flashcard</button>
       <div style="flex:1"></div>
-      <button onclick="exportAll()" style="padding:8px 12px;border-radius:9px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,248,238,0.35);font-size:0.76rem;cursor:pointer;font-weight:500">↓ Export</button>
-      <button onclick="document.getElementById('import-file').click()" style="padding:8px 12px;border-radius:9px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,248,238,0.35);font-size:0.76rem;cursor:pointer;font-weight:500">↑ Import</button>
+      <button onclick="exportAll()" style="padding:8px 12px;border-radius:0;background:#FFFDF7;border:2.5px solid #0D0D0D;box-shadow:3px 3px 0 #0D0D0D;color:#0D0D0D;font-size:0.76rem;cursor:pointer;font-weight:700;transition:all 0.1s">↓ Export</button>
+      <button onclick="document.getElementById('import-file').click()" style="padding:8px 12px;border-radius:0;background:#FFFDF7;border:2.5px solid #0D0D0D;box-shadow:3px 3px 0 #0D0D0D;color:#0D0D0D;font-size:0.76rem;cursor:pointer;font-weight:700;transition:all 0.1s">↑ Import</button>
       <input id="import-file" type="file" accept=".json" onchange="importAll(event)" style="display:none"/>
     </div>
     <div id="category-grid"></div>
     <div id="home-empty" style="display:none;text-align:center;padding:5rem 0">
-      <div style="font-family:'Noto Serif JP',serif;font-size:3.5rem;margin-bottom:14px;opacity:0.1;color:#FFF8EE">空</div>
-      <p style="font-size:0.88rem;color:rgba(255,248,238,0.28);font-weight:500">Belum ada kategori</p>
-      <p style="font-size:0.72rem;margin-top:7px;color:rgba(255,248,238,0.16)">Mulai dengan klik "＋ Kategori"</p>
+      <div style="font-family:'Noto Sans JP',sans-serif;font-size:3.5rem;margin-bottom:14px;opacity:0.2;color:#0D0D0D">空</div>
+      <p style="font-size:0.88rem;color:rgba(13,13,13,0.45);font-weight:700">Belum ada kategori</p>
+      <p style="font-size:0.72rem;margin-top:7px;color:rgba(13,13,13,0.35);font-weight:500">Mulai dengan klik "＋ Kategori"</p>
     </div>
   </div>
 
@@ -346,15 +512,15 @@ select option{background:#0D1526;color:#FFF8EE}
       <div style="display:flex;align-items:center;gap:12px">
         <div id="cat-view-icon" style="width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0"></div>
         <div>
-          <h2 id="cat-view-name" style="font-family:'Noto Sans JP',sans-serif;font-size:1.3rem;color:#FFF8EE;font-weight:700;line-height:1.2"></h2>
-          <p id="cat-view-count" style="font-size:0.7rem;color:rgba(255,248,238,0.3);margin-top:2px"></p>
+          <h2 id="cat-view-name" style="font-family:'Noto Sans JP',sans-serif;font-size:1.3rem;color:#0D0D0D;font-weight:800;line-height:1.2"></h2>
+          <p id="cat-view-count" style="font-size:0.7rem;color:rgba(13,13,13,0.45);margin-top:2px;font-weight:600"></p>
         </div>
       </div>
       <div style="display:flex;gap:7px;flex-wrap:wrap">
-        <button onclick="openCardModal(null)" class="btn-gold" style="padding:8px 14px;font-size:0.78rem;border-radius:9px">＋ Flashcard</button>
-        <button onclick="openStudy()" style="padding:8px 14px;border-radius:9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,248,238,0.72);font-weight:600;font-size:0.78rem;cursor:pointer">▶ Belajar</button>
-        <button onclick="editCurrentCategory()" style="width:34px;height:34px;border-radius:9px;background:rgba(232,177,93,0.08);border:1px solid rgba(232,177,93,0.18);color:#E8B15D;cursor:pointer;font-size:0.82rem;display:flex;align-items:center;justify-content:center">✏</button>
-        <button onclick="deleteCurrentCategory()" id="del-cat-btn" data-confirm="0" style="width:34px;height:34px;border-radius:9px;background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.15);color:#f87171;cursor:pointer;font-size:0.82rem;display:flex;align-items:center;justify-content:center">🗑</button>
+        <button onclick="openCardModal(null)" class="btn-red" style="padding:8px 14px;font-size:0.78rem;border-radius:0">＋ Flashcard</button>
+        <button onclick="openStudy()" style="padding:8px 14px;border-radius:0;background:#4CAF50;border:2.5px solid #0D0D0D;box-shadow:3px 3px 0 #0D0D0D;color:#FFFFFF;font-weight:800;font-size:0.78rem;cursor:pointer;transition:all 0.1s">▶ Belajar</button>
+        <button onclick="editCurrentCategory()" style="width:34px;height:34px;border-radius:0;background:#E8B15D;border:2.5px solid #0D0D0D;box-shadow:2px 2px 0 #0D0D0D;color:#0D0D0D;cursor:pointer;font-size:0.82rem;display:flex;align-items:center;justify-content:center;font-weight:700;transition:all 0.1s">✏</button>
+        <button onclick="deleteCurrentCategory()" id="del-cat-btn" data-confirm="0" style="width:34px;height:34px;border-radius:0;background:#FF6B6B;border:2.5px solid #0D0D0D;box-shadow:2px 2px 0 #0D0D0D;color:#0D0D0D;cursor:pointer;font-size:0.82rem;display:flex;align-items:center;justify-content:center;transition:all 0.1s">🗑</button>
       </div>
     </div>
     <div class="search-wrap">
@@ -363,8 +529,8 @@ select option{background:#0D1526;color:#FFF8EE}
     <div id="cat-cards-list"></div>
     <div id="cat-empty" style="display:none;text-align:center;padding:4rem 0">
       <div style="font-size:2rem;margin-bottom:10px;opacity:0.2">📭</div>
-      <p style="font-size:0.85rem;color:rgba(255,248,238,0.28);font-weight:500">Belum ada flashcard</p>
-      <p style="font-size:0.7rem;margin-top:6px;color:rgba(255,248,238,0.16)">Klik "＋ Flashcard" untuk menambahkan</p>
+      <p style="font-size:0.85rem;color:rgba(13,13,13,0.45);font-weight:700">Belum ada flashcard</p>
+      <p style="font-size:0.7rem;margin-top:6px;color:rgba(13,13,13,0.35);font-weight:500">Klik "＋ Flashcard" untuk menambahkan</p>
     </div>
   </div>
 
@@ -372,9 +538,9 @@ select option{background:#0D1526;color:#FFF8EE}
 </div>
 
 <!-- Loading screen -->
-<div id="loading-screen" style="display:none;position:fixed;inset:0;z-index:70;background:#06091C;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+<div id="loading-screen" style="display:none;position:fixed;inset:0;z-index:70;background:#FFF9F0;flex-direction:column;align-items:center;justify-content:center;gap:16px">
   <div class="spinner"></div>
-  <p style="font-size:0.75rem;color:rgba(255,248,238,0.28);letter-spacing:1px">Memuat...</p>
+  <p style="font-size:0.75rem;color:rgba(13,13,13,0.45);letter-spacing:1px;font-weight:700">Memuat...</p>
 </div>
 
 <div id="toast"></div>
@@ -829,19 +995,19 @@ function renderCategoryView(){
     <div class="card-item">
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px">
-          <span style="font-family:'Noto Sans JP',sans-serif;font-size:1.5rem;color:#FFF8EE;font-weight:700;line-height:1.2;letter-spacing:0">${esc(card.japanese)}</span>
+          <span style="font-family:'Noto Sans JP',sans-serif;font-size:1.5rem;color:#0D0D0D;font-weight:800;line-height:1.2;letter-spacing:0">${esc(card.japanese)}</span>
           ${card.aiDetected?'<span style="font-size:0.58rem;color:#86efac;background:rgba(134,239,172,0.09);border:1px solid rgba(134,239,172,0.2);border-radius:5px;padding:2px 7px;font-weight:700;letter-spacing:1px">AI</span>':''}
         </div>
         <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:3px">
-          ${card.reading_hiragana?`<span style="font-family:'Noto Serif JP',serif;font-size:0.78rem;color:rgba(255,248,238,0.44);letter-spacing:1px">${esc(card.reading_hiragana)}</span>`:''}
+          ${card.reading_hiragana?`<span style="font-family:'Noto Serif JP',serif;font-size:0.78rem;color:rgba(13,13,13,0.55);letter-spacing:0.5px">${esc(card.reading_hiragana)}</span>`:''}
           ${card.reading_hiragana&&card.reading_romaji?'<span style="color:rgba(255,255,255,0.14);font-size:0.62rem">·</span>':''}
-          ${card.reading_romaji?`<span style="font-size:0.72rem;color:rgba(255,248,238,0.28);font-style:italic">${esc(card.reading_romaji)}</span>`:''}
+          ${card.reading_romaji?`<span style="font-size:0.72rem;color:rgba(13,13,13,0.4);font-style:italic">${esc(card.reading_romaji)}</span>`:''}
         </div>
-        <span style="font-size:0.88rem;color:rgba(255,248,238,0.6);font-weight:500">${esc(card.meaning)}</span>
+        <span style="font-size:0.88rem;color:#0D0D0D;font-weight:600">${esc(card.meaning)}</span>
       </div>
       <div class="card-actions" style="display:flex;gap:6px;flex-shrink:0">
-        <button onclick="openCardModal(cards.find(c=>c.id===${card.id}))" style="width:33px;height:33px;border-radius:9px;border:1px solid rgba(232,177,93,0.18);background:rgba(232,177,93,0.07);color:#E8B15D;cursor:pointer;font-size:0.8rem;display:flex;align-items:center;justify-content:center">✏</button>
-        <button onclick="confirmDeleteCard(${card.id},this)" data-confirm="0" style="width:33px;height:33px;border-radius:9px;border:1px solid rgba(239,68,68,0.14);background:rgba(239,68,68,0.06);color:#f87171;cursor:pointer;font-size:0.8rem;display:flex;align-items:center;justify-content:center">🗑</button>
+        <button onclick="openCardModal(cards.find(c=>c.id===${card.id}))" style="width:33px;height:33px;border-radius:0;border:2px solid #0D0D0D;background:#E8B15D;box-shadow:2px 2px 0 #0D0D0D;color:#0D0D0D;cursor:pointer;font-size:0.8rem;display:flex;align-items:center;justify-content:center;font-weight:700;transition:all 0.1s">✏</button>
+        <button onclick="confirmDeleteCard(${card.id},this)" data-confirm="0" style="width:33px;height:33px;border-radius:0;border:2px solid #0D0D0D;background:#FF6B6B;box-shadow:2px 2px 0 #0D0D0D;color:#0D0D0D;cursor:pointer;font-size:0.8rem;display:flex;align-items:center;justify-content:center;transition:all 0.1s">🗑</button>
       </div>
     </div>`).join('');
 }
@@ -955,9 +1121,9 @@ function setAIStatus(status,msg='',fromCache=false){
   errMsg.style.display=status==='error'?'block':'none';
   if(status==='error')errMsg.textContent=msg;
   const map={
-    loading:{l:'⟳ Menerjemahkan...',c:'rgba(126,181,232,0.9)',bg:'rgba(126,181,232,0.09)',b:'rgba(126,181,232,0.2)'},
-    success:{l:fromCache?'✦ AI (cached)':'✦ AI detected',c:'#86efac',bg:'rgba(134,239,172,0.08)',b:'rgba(134,239,172,0.22)'},
-    error:  {l:'✕ Gagal',c:'#fca5a5',bg:'rgba(252,165,165,0.08)',b:'rgba(252,165,165,0.2)'},
+    loading:{l:'⟳ Menerjemahkan...',c:'#0D0D0D',bg:'#B8D4F0',b:'#0D0D0D'},
+    success:{l:fromCache?'✦ AI (cached)':'✦ AI detected',c:'#0D0D0D',bg:'#B7F5C4',b:'#0D0D0D'},
+    error:  {l:'✕ Gagal',c:'#0D0D0D',bg:'#FFB3B3',b:'#0D0D0D'},
   };
   if(map[status]){const c=map[status];badge.textContent=c.l;badge.style.color=c.c;badge.style.background=c.bg;badge.style.border='1px solid '+c.b}
 }
@@ -1009,8 +1175,8 @@ function studyNext(){studyIndex=(studyIndex+1)%studyDeck.length;updateStudyCard(
 function studyPrev(){studyIndex=(studyIndex-1+studyDeck.length)%studyDeck.length;updateStudyCard()}
 function toggleShuffle(){
   shuffleOn=!shuffleOn;const btn=document.getElementById('shuffle-btn');
-  if(shuffleOn){studyDeck=[...studyDeck].sort(()=>Math.random()-0.5);btn.style.color='#E8B15D';btn.style.background='rgba(232,177,93,0.1)';btn.style.borderColor='rgba(232,177,93,0.25)'}
-  else{studyDeck=[...(currentCatId?cards.filter(c=>c.categoryId===currentCatId):cards)];btn.style.color='rgba(255,248,238,0.38)';btn.style.background='rgba(255,255,255,0.04)';btn.style.borderColor='rgba(255,255,255,0.08)'}
+  if(shuffleOn){studyDeck=[...studyDeck].sort(()=>Math.random()-0.5);btn.style.color='#0D0D0D';btn.style.background='#E8B15D';btn.style.boxShadow='3px 3px 0 #0D0D0D'}
+  else{studyDeck=[...(currentCatId?cards.filter(c=>c.categoryId===currentCatId):cards)];btn.style.color='#0D0D0D';btn.style.background='#FFFDF7';btn.style.boxShadow='3px 3px 0 #0D0D0D'}
   studyIndex=0;updateStudyCard();
 }
 function handleKeydown(e){
